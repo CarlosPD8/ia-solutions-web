@@ -69,7 +69,7 @@ export const HeroSection = ({
                 </div>
               </div>
               <p className="mt-2 text-[11px] text-slate-500">
-                Datos ficticios ilustrativos. Te ayudamos a construir tus propios
+                Te ayudamos a construir tus propios
                 cuadros de mando de IA.
               </p>
             </div>
