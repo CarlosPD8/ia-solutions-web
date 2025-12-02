@@ -3,27 +3,27 @@
 import { motion } from "framer-motion";
 
 /**
- * Fondo con “conexiones neuronales”:
+ * Fondo con conexiones tipo "red neuronal":
  * - Base clara
  * - Red de líneas y nodos en SVG
- * - Algunos nodos flotantes animados
+ * - Nodos flotantes que dan sensación de movimiento
  */
 export const NeuralBackground = () => {
   return (
     <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-slate-50">
       {/* Red principal en SVG */}
       <motion.svg
-        className="absolute inset-0 h-full w-full opacity-70"
+        className="absolute inset-0 h-full w-full opacity-80"
         viewBox="0 0 1440 900"
-        initial={{ opacity: 0.4 }}
-        animate={{ opacity: 0.8 }}
-        transition={{ duration: 8, repeat: Infinity, repeatType: "reverse" }}
+        initial={{ opacity: 0.6 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 10, repeat: Infinity, repeatType: "reverse" }}
       >
         <defs>
           <linearGradient id="neural-line" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#4ade80" stopOpacity="0.25" />
-            <stop offset="50%" stopColor="#22c55e" stopOpacity="0.5" />
-            <stop offset="100%" stopColor="#38bdf8" stopOpacity="0.3" />
+            <stop offset="0%" stopColor="#22c55e" stopOpacity="0.25" />
+            <stop offset="50%" stopColor="#22c55e" stopOpacity="0.7" />
+            <stop offset="100%" stopColor="#38bdf8" stopOpacity="0.4" />
           </linearGradient>
           <radialGradient id="neural-node" r="1">
             <stop offset="0%" stopColor="#a7f3d0" stopOpacity="0.9" />
@@ -31,39 +31,39 @@ export const NeuralBackground = () => {
           </radialGradient>
         </defs>
 
-        {/* Algunas conexiones principales */}
+        {/* Conexiones principales */}
         <motion.path
           d="M120 200 L380 260 L620 180 L900 260 L1180 210"
           fill="none"
           stroke="url(#neural-line)"
-          strokeWidth="1.5"
+          strokeWidth="1.8"
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeDasharray="4 10"
           animate={{ strokeDashoffset: [0, -40, 0] }}
-          transition={{ duration: 14, repeat: Infinity, ease: "linear" }}
+          transition={{ duration: 14, repeat: Infinity }}
         />
         <motion.path
           d="M200 480 L420 380 L680 420 L960 360 L1220 440"
           fill="none"
           stroke="url(#neural-line)"
-          strokeWidth="1.2"
+          strokeWidth="1.6"
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeDasharray="3 9"
           animate={{ strokeDashoffset: [0, -30, 0] }}
-          transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
+          transition={{ duration: 18, repeat: Infinity }}
         />
         <motion.path
           d="M160 720 L420 640 L710 700 L980 640 L1260 720"
           fill="none"
           stroke="url(#neural-line)"
-          strokeWidth="1.2"
+          strokeWidth="1.6"
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeDasharray="4 12"
           animate={{ strokeDashoffset: [0, -50, 0] }}
-          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+          transition={{ duration: 20, repeat: Infinity }}
         />
 
         {/* Nodos estáticos */}
@@ -85,39 +85,23 @@ export const NeuralBackground = () => {
           [1260, 720],
         ].map(([x, y], i) => (
           <g key={`${x}-${y}-${i}`}>
-            <circle cx={x} cy={y} r={3} fill="#22c55e" fillOpacity="0.85" />
+            <circle cx={x} cy={y} r={3} fill="#22c55e" fillOpacity={0.95} />
             <circle
               cx={x}
               cy={y}
               r={16}
               fill="url(#neural-node)"
-              opacity={0.7}
+              opacity={0.9}
             />
           </g>
         ))}
       </motion.svg>
 
-      {/* Nodos flotantes “partículas” */}
-      <FloatingNode
-        className="left-[10%] top-[18%]"
-        size={110}
-        delay={0}
-      />
-      <FloatingNode
-        className="left-[75%] top-[28%]"
-        size={150}
-        delay={3}
-      />
-      <FloatingNode
-        className="left-[20%] top-[65%]"
-        size={130}
-        delay={1.5}
-      />
-      <FloatingNode
-        className="left-[70%] top-[70%]"
-        size={120}
-        delay={4.5}
-      />
+      {/* Nodos flotantes / partículas */}
+      <FloatingNode className="left-[8%] top-[18%]" size={120} delay={0} />
+      <FloatingNode className="left-[75%] top-[25%]" size={170} delay={3} />
+      <FloatingNode className="left-[22%] top-[65%]" size={140} delay={1.5} />
+      <FloatingNode className="left-[72%] top-[70%]" size={130} delay={4.5} />
     </div>
   );
 };
@@ -128,12 +112,16 @@ type FloatingNodeProps = {
   delay?: number;
 };
 
-const FloatingNode = ({ className = "", size, delay = 0 }: FloatingNodeProps) => {
+const FloatingNode = ({
+  className = "",
+  size,
+  delay = 0,
+}: FloatingNodeProps) => {
   return (
     <motion.div
       className={`pointer-events-none absolute ${className}`}
-      initial={{ opacity: 0.3, y: 0 }}
-      animate={{ opacity: [0.25, 0.55, 0.25], y: [-10, 6, -10] }}
+      initial={{ opacity: 0.35, y: 0 }}
+      animate={{ opacity: [0.3, 0.7, 0.3], y: [-12, 8, -12] }}
       transition={{
         duration: 18,
         delay,
@@ -142,13 +130,11 @@ const FloatingNode = ({ className = "", size, delay = 0 }: FloatingNodeProps) =>
       }}
     >
       <div
-        className="rounded-full bg-emerald-200/40 blur-2xl"
+        className="rounded-full bg-emerald-200/50 blur-2xl"
         style={{ width: size, height: size }}
       />
-      <div
-        className="absolute inset-6 rounded-full border border-emerald-300/60 bg-emerald-50/40"
-      />
-      <div className="absolute inset-[35%] rounded-full bg-emerald-400/70 blur-md" />
+      <div className="absolute inset-6 rounded-full border border-emerald-300/70 bg-emerald-50/60" />
+      <div className="absolute inset-[35%] rounded-full bg-emerald-400/80 blur-md" />
     </motion.div>
   );
 };

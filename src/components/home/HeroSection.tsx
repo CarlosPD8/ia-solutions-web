@@ -15,7 +15,7 @@ const container: Variants = {
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.7,
+      duration: 1,
       ease: [0.22, 0.61, 0.36, 1], // curva suave tipo "easeOut"
     },
   },

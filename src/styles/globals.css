@@ -40,7 +40,7 @@ body {
   }
 }
 
-/* Capa “glass” donde vive la app, encima del fondo neurona */
+/* Capa de la app: ahora TRANSPARENTE para ver bien el fondo IA */
 .app-shell {
-  @apply bg-white/80 backdrop-blur-xl;
+  @apply bg-transparent;
 }

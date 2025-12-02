@@ -18,7 +18,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body className="min-h-screen bg-slate-950 text-slate-50">
+      {/* NO ponemos bg-* aquí para no tapar el fondo neuronal */}
+      <body className="min-h-screen">
         {children}
       </body>
     </html>
