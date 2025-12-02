@@ -1,14 +1,22 @@
+import React from "react";
 import { Navbar } from "./Navbar";
 import { Footer } from "./Footer";
+import { NeuralBackground } from "./NeuralBackground";
 
 export const MainLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="flex min-h-screen flex-col" id="inicio">
-      <Navbar />
-      <main className="flex-1 bg-gradient-to-b from-slate-950 via-slate-950 to-slate-900">
-        {children}
-      </main>
-      <Footer />
+    <div className="relative min-h-screen" id="inicio">
+      {/* Fondo IA con conexiones neuronales */}
+      <NeuralBackground />
+
+      {/* Capa glass con el contenido de la web */}
+      <div className="app-shell flex min-h-screen flex-col">
+        <Navbar />
+        <main className="flex-1">
+          {children}
+        </main>
+        <Footer />
+      </div>
     </div>
   );
 };
