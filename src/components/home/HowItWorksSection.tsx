@@ -174,10 +174,14 @@ const DevelopmentPreview = () => {
             {"const result = await runPipeline({"}
           </span>
         </p>
-        <p className="ml-4 text-slate-300">input,</p>
-        <p className="ml-4 text-slate-300">model: "enterprise-ia",</p>
         <p className="ml-4 text-slate-300">
-          callbacks: ["logging", "metrics"]
+          {"input,"}
+        </p>
+        <p className="ml-4 text-slate-300">
+          {'model: "enterprise-ia",'}
+        </p>
+        <p className="ml-4 text-slate-300">
+          {'callbacks: ["logging", "metrics"]'}
         </p>
         <p>{"});"}</p>
         <motion.span
