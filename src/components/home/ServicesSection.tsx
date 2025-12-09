@@ -1,10 +1,34 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 import { Service } from "@/core/domain/service";
 
 type Props = {
   services: Service[];
+};
+
+const sectionVariants: Variants = {
+  hidden: { opacity: 0, y: 40 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 1,
+      ease: [0.22, 0.61, 0.36, 1],
+    },
+  },
+};
+
+const cardVariants: Variants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.8,
+      ease: [0.22, 0.61, 0.36, 1],
+    },
+  },
 };
 
 export const ServicesSection = ({ services }: Props) => {
@@ -13,14 +37,21 @@ export const ServicesSection = ({ services }: Props) => {
       id="servicios"
       className="border-b border-slate-200 bg-transparent"
     >
-      <div className="mx-auto max-w-6xl px-4 py-14">
+      <motion.div
+        className="mx-auto max-w-6xl px-4 py-14"
+        variants={sectionVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.25 }}
+      >
         <div className="mb-8 space-y-3">
           <h2 className="text-2xl font-semibold tracking-tight text-slate-900">
             Servicios de IA para tu empresa
           </h2>
           <p className="max-w-2xl text-sm text-slate-600">
-            Más que proyectos aislados: diseñamos soluciones de IA integradas en
-            tu negocio, con foco en impacto real y retorno medible.
+            Soluciones de IA diseñadas para aportar impacto real en tus
+            procesos, desde asistentes inteligentes hasta automatización y
+            analítica avanzada.
           </p>
         </div>
 
@@ -29,16 +60,12 @@ export const ServicesSection = ({ services }: Props) => {
             <motion.article
               key={service.id}
               className="group relative flex h-full flex-col rounded-3xl border border-slate-200 bg-white/90 p-4 shadow-[0_22px_55px_rgba(15,23,42,0.08)] transition-all hover:-translate-y-2 hover:border-emerald-300 hover:shadow-[0_28px_70px_rgba(16,185,129,0.25)]"
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              variants={cardVariants}
+              initial="hidden"
+              whileInView="visible"
               viewport={{ once: true, amount: 0.3 }}
-              transition={{
-                duration: 0.45,
-                delay: index * 0.08,
-                ease: [0.22, 0.61, 0.36, 1],
-              }}
             >
-              {/* Panel interactivo superior (oscuro) */}
+              {/* Panel interactivo superior */}
               <div className="mb-4 rounded-2xl border border-emerald-500/30 bg-slate-950 px-4 py-3 text-emerald-50 shadow-inner">
                 {renderServicePreview(service.id)}
               </div>
@@ -70,18 +97,17 @@ export const ServicesSection = ({ services }: Props) => {
             </motion.article>
           ))}
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 };
 
-/* --------- PREVIEWS ANIMADOS POR SERVICIO --------- */
+/* ========= PREVIEWS ANIMADOS POR SERVICIO ========= */
 
 function renderServicePreview(serviceId: string) {
   if (serviceId === "chatbots") return <ChatbotPreview />;
   if (serviceId === "automation") return <AutomationPreview />;
   if (serviceId === "analytics") return <AnalyticsPreview />;
-
   return <DefaultPreview />;
 }
 
@@ -104,7 +130,7 @@ const ChatbotPreview = () => {
             ease: [0.22, 0.61, 0.36, 1],
           }}
         >
-          “¿Cómo podemos automatizar las consultas repetitivas?”
+          “¿Cómo automatizamos las consultas repetitivas?”
         </motion.div>
         <motion.div
           className="ml-auto inline-flex max-w-[80%] rounded-2xl bg-emerald-500 px-3 py-1.5 text-[11px] text-slate-950"
@@ -116,7 +142,7 @@ const ChatbotPreview = () => {
             ease: [0.22, 0.61, 0.36, 1],
           }}
         >
-          Diseñamos un chatbot entrenado con tus procesos y FAQs.
+          Diseñamos un chatbot entrenado con tu negocio.
         </motion.div>
       </div>
     </div>
@@ -163,9 +189,7 @@ const AnalyticsPreview = () => {
         <span className="text-emerald-300">+18%</span>
       </div>
       <div className="relative h-20 w-full">
-        {/* Ejes */}
         <div className="absolute inset-0 rounded-lg border border-slate-800/70" />
-        {/* Línea principal */}
         <svg className="absolute inset-2 h-[calc(100%-16px)] w-[calc(100%-16px)]">
           <polyline
             fill="none"
@@ -174,7 +198,6 @@ const AnalyticsPreview = () => {
             points="0,40 30,32 60,36 90,20 120,26 150,12"
           />
         </svg>
-        {/* Punto que late */}
         <motion.div
           className="absolute"
           style={{ left: "70%", top: "24%" }}
@@ -189,9 +212,6 @@ const AnalyticsPreview = () => {
           <div className="h-5 w-5 rounded-full bg-emerald-400/40 blur-sm" />
         </motion.div>
       </div>
-      <p className="text-[11px] text-slate-400">
-        Modelos que transforman datos en decisiones claras para tu equipo.
-      </p>
     </div>
   );
 };

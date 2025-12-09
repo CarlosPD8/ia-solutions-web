@@ -1,11 +1,35 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 
 type Step = { id: string; title: string; description: string };
 
 type Props = {
   steps: Step[];
+};
+
+const sectionVariants: Variants = {
+  hidden: { opacity: 0, y: 40 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 1,
+      ease: [0.22, 0.61, 0.36, 1],
+    },
+  },
+};
+
+const cardVariants: Variants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.8,
+      ease: [0.22, 0.61, 0.36, 1],
+    },
+  },
 };
 
 export const HowItWorksSection = ({ steps }: Props) => {
@@ -14,7 +38,13 @@ export const HowItWorksSection = ({ steps }: Props) => {
       id="como-funciona"
       className="border-b border-slate-200 bg-transparent"
     >
-      <div className="mx-auto max-w-6xl px-4 py-14">
+      <motion.div
+        className="mx-auto max-w-6xl px-4 py-14"
+        variants={sectionVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.25 }}
+      >
         <div className="mb-8 space-y-3">
           <h2 className="text-2xl font-semibold tracking-tight text-slate-900">
             Cómo trabajamos contigo
@@ -30,14 +60,10 @@ export const HowItWorksSection = ({ steps }: Props) => {
             <motion.article
               key={step.id}
               className="group relative flex flex-col rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-[0_22px_55px_rgba(15,23,42,0.06)] transition-all hover:-translate-y-2 hover:border-emerald-300 hover:shadow-[0_28px_70px_rgba(16,185,129,0.25)]"
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              variants={cardVariants}
+              initial="hidden"
+              whileInView="visible"
               viewport={{ once: true, amount: 0.3 }}
-              transition={{
-                duration: 0.45,
-                delay: index * 0.08,
-                ease: [0.22, 0.61, 0.36, 1],
-              }}
             >
               {/* Panel superior oscuro con animación por paso */}
               <div className="mb-4 h-32 rounded-2xl border border-emerald-500/30 bg-slate-950 px-4 py-3 text-emerald-50">
@@ -57,12 +83,12 @@ export const HowItWorksSection = ({ steps }: Props) => {
             </motion.article>
           ))}
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 };
 
-/* --------- PREVIEWS ANIMADOS POR PASO --------- */
+/* ========= PREVIEWS ANIMADOS POR PASO ========= */
 
 function renderStepPreview(index: number) {
   if (index === 0) return <ContactPreview />;
@@ -71,7 +97,7 @@ function renderStepPreview(index: number) {
   return <TestPreview />;
 }
 
-/* Paso 1: contacto → toggle + slider */
+/* Paso 1: contacto */
 const ContactPreview = () => {
   return (
     <div className="flex h-full flex-col justify-between">
@@ -106,7 +132,6 @@ const ContactPreview = () => {
         <div className="relative h-1.5 w-full rounded-full bg-slate-800">
           <motion.div
             className="absolute left-0 top-0 h-1.5 rounded-full bg-emerald-400"
-            style={{ width: "60%" }}
             animate={{ width: ["40%", "80%", "55%"] }}
             transition={{
               duration: 5,
@@ -115,15 +140,12 @@ const ContactPreview = () => {
             }}
           />
         </div>
-        <p className="text-[10px] text-slate-500">
-          Primera llamada para entender vuestro contexto y detectar oportunidades.
-        </p>
       </div>
     </div>
   );
 };
 
-/* Paso 2: propuesta → grid de “integraciones” que se mueven */
+/* Paso 2: propuesta */
 const ProposalPreview = () => {
   const items = ["API", "CRM", "Support", "Ops", "Data", "Custom"];
 
@@ -151,14 +173,11 @@ const ProposalPreview = () => {
           </div>
         ))}
       </motion.div>
-      <p className="mt-1 text-[10px] text-slate-500">
-        Definimos alcance, integraciones y entregables en una propuesta clara.
-      </p>
     </div>
   );
 };
 
-/* Paso 3: desarrollo → snippet de código con cursor */
+/* Paso 3: desarrollo */
 const DevelopmentPreview = () => {
   return (
     <div className="flex h-full flex-col justify-between">
@@ -174,12 +193,8 @@ const DevelopmentPreview = () => {
             {"const result = await runPipeline({"}
           </span>
         </p>
-        <p className="ml-4 text-slate-300">
-          {"input,"}
-        </p>
-        <p className="ml-4 text-slate-300">
-          {'model: "enterprise-ia",'}
-        </p>
+        <p className="ml-4 text-slate-300">{"input,"}</p>
+        <p className="ml-4 text-slate-300">{'model: "enterprise-ia",'} </p>
         <p className="ml-4 text-slate-300">
           {'callbacks: ["logging", "metrics"]'}
         </p>
@@ -190,14 +205,11 @@ const DevelopmentPreview = () => {
           transition={{ duration: 1, repeat: Infinity }}
         />
       </div>
-      <p className="mt-1 text-[10px] text-slate-500">
-        Desarrollamos e integramos la solución en ciclos cortos y validados.
-      </p>
     </div>
   );
 };
 
-/* Paso 4: test & mejora / acompañamiento → “globo” girando */
+/* Paso 4: test & mejora */
 const TestPreview = () => {
   return (
     <div className="flex h-full flex-col justify-between">
@@ -207,7 +219,7 @@ const TestPreview = () => {
       </div>
       <div className="flex flex-1 items-center justify-center">
         <motion.div
-          className="relative h-20 w-20 rounded-full bg-gradient-to-b from-emerald-400/80 via-emerald-500/70 to-slate-900 shadow-[0_0_40px_rgba(16,185,129,0.6)]"
+          className="relative h-20 w-20 rounded-full bg-linear-to-b from-emerald-400/80 via-emerald-500/70 to-slate-900 shadow-[0_0_40px_rgba(16,185,129,0.6)]"
           animate={{ rotate: [0, 360] }}
           transition={{
             duration: 30,
@@ -220,10 +232,6 @@ const TestPreview = () => {
           <div className="absolute inset-x-0 bottom-0 h-1/2 rounded-b-full bg-slate-950/60" />
         </motion.div>
       </div>
-      <p className="mt-1 text-[10px] text-slate-500">
-        Medimos, refinamos y evolucionamos los modelos para que sigan aportando
-        ventaja competitiva.
-      </p>
     </div>
   );
 };
