@@ -7,7 +7,7 @@ type Props = {
   services: Service[];
 };
 
-const sectionVariants: Variants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0, y: 40 },
   visible: {
     opacity: 1,
@@ -15,6 +15,8 @@ const sectionVariants: Variants = {
     transition: {
       duration: 1,
       ease: [0.22, 0.61, 0.36, 1],
+      when: "beforeChildren",
+      staggerChildren: 0.12,
     },
   },
 };
@@ -39,7 +41,7 @@ export const ServicesSection = ({ services }: Props) => {
     >
       <motion.div
         className="mx-auto max-w-6xl px-4 py-14"
-        variants={sectionVariants}
+        variants={containerVariants}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.25 }}
@@ -61,9 +63,6 @@ export const ServicesSection = ({ services }: Props) => {
               key={service.id}
               className="group relative flex h-full flex-col rounded-3xl border border-slate-200 bg-white/90 p-4 shadow-[0_22px_55px_rgba(15,23,42,0.08)] transition-all hover:-translate-y-2 hover:border-emerald-300 hover:shadow-[0_28px_70px_rgba(16,185,129,0.25)]"
               variants={cardVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.3 }}
             >
               {/* Panel interactivo superior */}
               <div className="mb-4 rounded-2xl border border-emerald-500/30 bg-slate-950 px-4 py-3 text-emerald-50 shadow-inner">
