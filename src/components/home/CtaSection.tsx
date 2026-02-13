@@ -2,6 +2,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { enterBlurUp } from "@/components/motion/presets";
 
 type Props = {
   title: string;
@@ -14,14 +15,16 @@ export const CtaSection = ({ title, description, buttonText }: Props) => {
     <motion.section
       id="contacto"
       className="bg-transparent pb-16 pt-8"
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.3 }}
-      transition={{ duration: 0.6, ease: [0.22, 0.61, 0.36, 1] }}
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: true, amount: 0.25 }}
     >
       <div className="mx-auto max-w-6xl px-4">
-        <div className="card relative overflow-hidden rounded-3xl p-8 md:flex md:items-center md:justify-between md:gap-8">
-          {/* halo de luz */}
+        <motion.div
+          className="card relative overflow-hidden rounded-3xl p-8 md:flex md:items-center md:justify-between md:gap-8"
+          variants={enterBlurUp}
+        >
+          {/* halo de luz (INTACTO) */}
           <motion.div
             className="pointer-events-none absolute -left-10 top-0 h-40 w-40 rounded-full bg-[color:var(--color-secondary-500)]/35 blur-3xl"
             animate={{
@@ -51,7 +54,7 @@ export const CtaSection = ({ title, description, buttonText }: Props) => {
               {buttonText}
             </a>
           </div>
-        </div>
+        </motion.div>
       </div>
     </motion.section>
   );

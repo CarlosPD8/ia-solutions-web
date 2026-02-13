@@ -3,36 +3,15 @@
 
 import { motion, type Variants } from "framer-motion";
 import { Service } from "@/core/domain/service";
+import { enterBlurUp, stagger } from "@/components/motion/presets";
 
 type Props = {
   services: Service[];
 };
 
-const containerVariants: Variants = {
-  hidden: { opacity: 0, y: 40 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 1,
-      ease: [0.22, 0.61, 0.36, 1],
-      when: "beforeChildren",
-      staggerChildren: 0.12,
-    },
-  },
-};
+const containerVariants: Variants = stagger(0.08, 0.06);
 
-const cardVariants: Variants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.8,
-      ease: [0.22, 0.61, 0.36, 1],
-    },
-  },
-};
+const cardEnter: Variants = enterBlurUp;
 
 export const ServicesSection = ({ services }: Props) => {
   return (
@@ -41,10 +20,10 @@ export const ServicesSection = ({ services }: Props) => {
         className="mx-auto max-w-6xl px-4 py-14"
         variants={containerVariants}
         initial="hidden"
-        whileInView="visible"
+        whileInView="show"
         viewport={{ once: true, amount: 0.25 }}
       >
-        <div className="mb-8 space-y-3">
+        <motion.div className="mb-8 space-y-3" variants={cardEnter}>
           <h2 className="text-2xl font-semibold tracking-tight text-primary">
             Servicios de IA para tu empresa
           </h2>
@@ -53,21 +32,21 @@ export const ServicesSection = ({ services }: Props) => {
             procesos, desde asistentes inteligentes hasta automatización y
             analítica avanzada.
           </p>
-        </div>
+        </motion.div>
 
         <div className="grid gap-6 md:grid-cols-3">
           {services.map((service, index) => (
             <motion.article
               key={service.id}
               className="card group relative flex h-full flex-col rounded-3xl p-4 transition-all hover:-translate-y-2 hover:border-[color:var(--color-secondary-400)] hover:shadow-[0_0_30px_rgba(31,107,255,0.25)]"
-              variants={cardVariants}
+              variants={cardEnter}
             >
-              {/* Panel interactivo superior */}
+              {/* Panel interactivo superior (INTACTO) */}
               <div className="mb-4 rounded-2xl border border-default bg-[color:var(--color-primary-900)] px-4 py-3 text-primary shadow-inner">
                 {renderServicePreview(service.id)}
               </div>
 
-              {/* Contenido textual */}
+              {/* Contenido textual (INTACTO) */}
               <div className="flex flex-1 flex-col">
                 <div className="mb-2 flex items-center justify-between gap-2 text-xs text-muted">
                   <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-secondary">
@@ -99,7 +78,7 @@ export const ServicesSection = ({ services }: Props) => {
   );
 };
 
-/* ========= PREVIEWS ANIMADOS POR SERVICIO ========= */
+/* ========= PREVIEWS (INTACTOS) ========= */
 
 function renderServicePreview(serviceId: string) {
   if (serviceId === "chatbots") return <ChatbotPreview />;
@@ -178,11 +157,7 @@ const AutomationPreview = () => {
   );
 };
 
-/**
- * NUEVO preview Analytics:
- * - Más visual: mini “dashboard” con barras + línea + donut
- * - Animación suave (respira y recorre la línea) sin punto flotante raro
- */
+/* Tu AnalyticsPreview NUEVO (INTACTO) */
 const AnalyticsPreview = () => {
   return (
     <div className="space-y-3">
@@ -192,14 +167,11 @@ const AnalyticsPreview = () => {
       </div>
 
       <div className="relative grid h-20 grid-cols-[1fr_72px] gap-3">
-        {/* panel gráfico */}
         <div className="relative overflow-hidden rounded-xl border border-default bg-[color:var(--color-primary-900)]/70 p-2">
-          {/* rejilla sutil */}
           <div className="absolute inset-0 opacity-70">
             <div className="h-full w-full bg-[linear-gradient(to_right,rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.035)_1px,transparent_1px)] bg-[size:16px_16px]" />
           </div>
 
-          {/* barras + línea */}
           <div className="relative h-full">
             <div className="absolute bottom-1 left-1 right-1 flex items-end gap-1">
               {[10, 18, 14, 24, 20, 30, 26].map((v, i) => (
@@ -237,7 +209,6 @@ const AnalyticsPreview = () => {
               />
             </svg>
 
-            {/* glow sweep */}
             <motion.div
               className="pointer-events-none absolute -inset-6 opacity-50"
               animate={{ opacity: [0.18, 0.42, 0.18] }}
@@ -250,7 +221,6 @@ const AnalyticsPreview = () => {
           </div>
         </div>
 
-        {/* donut / KPI */}
         <div className="relative overflow-hidden rounded-xl border border-default bg-[color:var(--color-primary-900)]/70 p-2">
           <div className="flex h-full flex-col items-center justify-center">
             <div className="relative h-10 w-10">
@@ -280,9 +250,7 @@ const AnalyticsPreview = () => {
                 className="absolute inset-0 rounded-full"
                 animate={{ opacity: [0.15, 0.4, 0.15] }}
                 transition={{ duration: 4.4, repeat: Infinity, ease: "easeInOut" }}
-                style={{
-                  boxShadow: "0 0 22px rgba(31,107,255,0.35)",
-                }}
+                style={{ boxShadow: "0 0 22px rgba(31,107,255,0.35)" }}
               />
             </div>
             <div className="mt-1 text-[10px] font-medium text-primary">CTR</div>

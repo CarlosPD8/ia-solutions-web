@@ -1,25 +1,14 @@
 // src/components/home/HeroSection.tsx
 "use client";
 
-import { motion, type Variants } from "framer-motion";
+import { motion } from "framer-motion";
+import { enterBlurUp, stagger } from "@/components/motion/presets";
 
 type HeroProps = {
   title: string;
   subtitle: string;
   primaryCta: string;
   secondaryCta: string;
-};
-
-const container: Variants = {
-  hidden: { opacity: 0, y: 40 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 1,
-      ease: [0.22, 0.61, 0.36, 1], // curva suave tipo "easeOut"
-    },
-  },
 };
 
 export const HeroSection = ({
@@ -32,22 +21,37 @@ export const HeroSection = ({
     <section className="border-b border-default bg-transparent">
       <motion.div
         className="mx-auto flex max-w-6xl flex-col gap-12 px-4 pb-16 pt-20 md:flex-row md:items-center md:justify-between"
-        variants={container}
+        variants={stagger(0.09, 0.06)}
         initial="hidden"
-        animate="visible"
+        animate="show"
       >
         {/* Texto */}
         <div className="max-w-xl space-y-6">
-          <span className="inline-flex rounded-full border border-default bg-[color:var(--color-bg-soft)]/60 px-3 py-1 text-xs font-medium text-secondary">
+          <motion.span
+            className="inline-flex rounded-full border border-default bg-[color:var(--color-bg-soft)]/60 px-3 py-1 text-xs font-medium text-secondary"
+            variants={enterBlurUp}
+          >
             Soluciones de IA para empresas
-          </span>
-          <h1 className="text-3xl font-semibold tracking-tight text-primary sm:text-4xl lg:text-5xl">
+          </motion.span>
+
+          <motion.h1
+            className="text-3xl font-semibold tracking-tight text-primary sm:text-4xl lg:text-5xl"
+            variants={enterBlurUp}
+          >
             {title}
-          </h1>
-          <p className="text-sm leading-relaxed text-muted sm:text-base">
+          </motion.h1>
+
+          <motion.p
+            className="text-sm leading-relaxed text-muted sm:text-base"
+            variants={enterBlurUp}
+          >
             {subtitle}
-          </p>
-          <div className="flex flex-col gap-3 sm:flex-row">
+          </motion.p>
+
+          <motion.div
+            className="flex flex-col gap-3 sm:flex-row"
+            variants={enterBlurUp}
+          >
             <a
               href="#contacto"
               className="btn-primary inline-flex items-center justify-center rounded-full px-5 py-2.5 text-sm font-medium"
@@ -60,26 +64,17 @@ export const HeroSection = ({
             >
               {secondaryCta}
             </a>
-          </div>
-          <p className="text-xs text-muted">
+          </motion.div>
+
+          <motion.p className="text-xs text-muted" variants={enterBlurUp}>
             Evaluación inicial gratuita. Sin compromisos.
-          </p>
+          </motion.p>
         </div>
 
-        {/* Tarjeta animada tipo panel */}
+        {/* Tarjeta animada tipo panel (mantiene animaciones internas) */}
         <motion.div
           className="relative mx-auto w-full max-w-md"
-          initial={{ opacity: 0, scale: 0.9, y: 30 }}
-          animate={{
-            opacity: 1,
-            scale: 1,
-            y: 0,
-          }}
-          transition={{
-            delay: 0.2,
-            duration: 0.7,
-            ease: [0.22, 0.61, 0.36, 1],
-          }}
+          variants={enterBlurUp}
         >
           <div className="card relative rounded-3xl p-5">
             <div className="flex items-center justify-between">
@@ -105,7 +100,7 @@ export const HeroSection = ({
             </p>
           </div>
 
-          {/* halo animado */}
+          {/* halo animado (INTACTO) */}
           <motion.div
             className="pointer-events-none absolute -inset-6 -z-10 rounded-[2.5rem] bg-[color:var(--color-secondary-500)]/25 blur-3xl"
             animate={{

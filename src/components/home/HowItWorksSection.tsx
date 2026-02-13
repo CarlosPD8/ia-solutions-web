@@ -2,53 +2,25 @@
 "use client";
 
 import { motion, type Variants } from "framer-motion";
+import { enterBlurUp, stagger } from "@/components/motion/presets";
 
 type Step = { id: string; title: string; description: string };
+type Props = { steps: Step[] };
 
-type Props = {
-  steps: Step[];
-};
-
-const containerVariants: Variants = {
-  hidden: { opacity: 0, y: 40 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 1,
-      ease: [0.22, 0.61, 0.36, 1],
-      when: "beforeChildren",
-      staggerChildren: 0.12,
-    },
-  },
-};
-
-const cardVariants: Variants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.8,
-      ease: [0.22, 0.61, 0.36, 1],
-    },
-  },
-};
+const containerVariants: Variants = stagger(0.08, 0.06);
+const cardEnter: Variants = enterBlurUp;
 
 export const HowItWorksSection = ({ steps }: Props) => {
   return (
-    <section
-      id="como-funciona"
-      className="border-b border-default bg-transparent"
-    >
+    <section id="como-funciona" className="border-b border-default bg-transparent">
       <motion.div
         className="mx-auto max-w-6xl px-4 py-14"
         variants={containerVariants}
         initial="hidden"
-        whileInView="visible"
+        whileInView="show"
         viewport={{ once: true, amount: 0.25 }}
       >
-        <div className="mb-8 space-y-3">
+        <motion.div className="mb-8 space-y-3" variants={cardEnter}>
           <h2 className="text-2xl font-semibold tracking-tight text-primary">
             Cómo trabajamos contigo
           </h2>
@@ -56,28 +28,26 @@ export const HowItWorksSection = ({ steps }: Props) => {
             Un proceso claro de principio a fin: desde entender tu contexto
             hasta acompañarte en la mejora continua de las soluciones de IA.
           </p>
-        </div>
+        </motion.div>
 
         <div className="grid gap-6 md:grid-cols-2">
           {steps.map((step, index) => (
             <motion.article
               key={step.id}
               className="card group relative flex flex-col rounded-3xl p-5 transition-all hover:-translate-y-2 hover:border-[color:var(--color-secondary-400)] hover:shadow-[0_0_30px_rgba(31,107,255,0.25)]"
-              variants={cardVariants}
+              variants={cardEnter}
             >
-              {/* Panel superior (sin “doble tarjeta”) */}
+              {/* Panel superior (INTACTO) */}
               <div className="mb-4 overflow-hidden rounded-2xl border border-default bg-[color:var(--color-primary-900)] px-4 py-3 text-primary shadow-inner">
                 {renderStepPreview(index)}
               </div>
 
-              {/* Texto del paso */}
+              {/* Texto (INTACTO) */}
               <div className="space-y-2">
                 <p className="text-xs font-mono uppercase tracking-[0.2em] text-secondary">
                   {String(index + 1).padStart(2, "0")}.
                 </p>
-                <h3 className="text-sm font-semibold text-primary">
-                  {step.title}
-                </h3>
+                <h3 className="text-sm font-semibold text-primary">{step.title}</h3>
                 <p className="text-xs text-muted">{step.description}</p>
               </div>
             </motion.article>
@@ -88,7 +58,7 @@ export const HowItWorksSection = ({ steps }: Props) => {
   );
 };
 
-/* ========= PREVIEWS ANIMADOS POR PASO ========= */
+/* ========= PREVIEWS (INTACTOS) ========= */
 
 function renderStepPreview(index: number) {
   if (index === 0) return <ContactPreview />;
@@ -97,7 +67,6 @@ function renderStepPreview(index: number) {
   return <TestPreview />;
 }
 
-/* Paso 1: contacto */
 const ContactPreview = () => {
   return (
     <div className="flex h-full flex-col justify-between">
@@ -145,7 +114,6 @@ const ContactPreview = () => {
   );
 };
 
-/* Paso 2: propuesta */
 const ProposalPreview = () => {
   const items = ["API", "CRM", "Support", "Ops", "Data", "Custom"];
 
@@ -177,7 +145,6 @@ const ProposalPreview = () => {
   );
 };
 
-/* Paso 3: desarrollo (FIX: sin tarjeta extra + cursor dentro) */
 const DevelopmentPreview = () => {
   return (
     <div className="flex h-full flex-col justify-between">
@@ -188,7 +155,6 @@ const DevelopmentPreview = () => {
         </span>
       </div>
 
-      {/* Un solo “panel” limpio, con overflow-hidden para que nada se salga */}
       <div className="relative flex-1 overflow-hidden rounded-xl border border-default bg-[color:var(--color-primary-900)]/70 p-3 text-[10px] font-mono text-primary">
         <p>
           <span className="text-secondary">
@@ -197,19 +163,15 @@ const DevelopmentPreview = () => {
         </p>
         <p className="ml-4 text-muted">{"input,"}</p>
         <p className="ml-4 text-muted">{'model: "enterprise-ia",'} </p>
-        <p className="ml-4 text-muted">
-          {'callbacks: ["logging", "metrics"]'}
-        </p>
+        <p className="ml-4 text-muted">{'callbacks: ["logging", "metrics"]'}</p>
         <p>{"});"}</p>
 
-        {/* Cursor dentro del panel (no se sale) */}
         <motion.span
           className="absolute bottom-3 left-3 h-3 w-[1px] bg-secondary"
           animate={{ opacity: [0, 1, 0] }}
           transition={{ duration: 1, repeat: Infinity }}
         />
 
-        {/* Glow sutil interno, recortado */}
         <motion.div
           className="pointer-events-none absolute -inset-10 opacity-60"
           animate={{ opacity: [0.25, 0.5, 0.25] }}
@@ -224,7 +186,6 @@ const DevelopmentPreview = () => {
   );
 };
 
-/* Paso 4: test & mejora */
 const TestPreview = () => {
   return (
     <div className="flex h-full flex-col justify-between">
