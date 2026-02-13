@@ -48,7 +48,7 @@ export const CtaSection = ({ title, description, buttonText }: Props) => {
 
           <div className="relative mt-6 md:mt-0">
             <a
-              href="https://wa.me/34670294712?text=Hola%20quiero%20información%20sobre%20una%20solución%20de%20IA"
+              href="https://wa.me/34670294712?text=Hola%20quiero%20información%20sobre%20una%20solución%20con%20IA"
               target="_blank"
               rel="noopener noreferrer"
               className="btn-primary inline-flex items-center justify-center rounded-full px-6 py-2.5 text-sm font-medium"
