@@ -1,306 +1,320 @@
 // src/components/layout/NeuralBackground.tsx
 "use client";
 
-import { motion } from "framer-motion";
+import { useEffect, useMemo, useRef } from "react";
 
 /**
- * Fondo "hex-grid" moderno, palpitante (respira) con líneas iluminadas
- * y trazos animados tipo circuito. Inspirado en la referencia.
+ * Fondo: rejilla HEX a pantalla completa (canvas)
+ * - Base: hexágonos sutiles
+ * - Hover: el hex bajo el ratón se ilumina con azul eléctrico (con decay suave)
+ * - No bloquea clicks (pointer-events: none) y escucha el ratón desde window
+ * - Colores desde CSS vars:
+ *   --color-bg
+ *   --color-secondary-500 (azul eléctrico)
  */
 export const NeuralBackground = () => {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  const cfg = useMemo(
+    () => ({
+      // tamaño del hex (radio)
+      hexSize: 26,
+      // intensidad base del grid
+      baseStrokeAlpha: 0.075,
+      // brillo hover
+      glowAlpha: 0.9,
+      // velocidad de “apagado” (más alto = se apaga más rápido)
+      decayPerSecond: 1.4,
+      // “respirar” muy suave
+      breatheSpeed: 0.6,
+      breatheAmount: 0.02,
+    }),
+    []
+  );
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    // Offscreen para el grid estático
+    const baseCanvas = document.createElement("canvas");
+    const baseCtx = baseCanvas.getContext("2d");
+    if (!baseCtx) return;
+
+    const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+
+    const css = getComputedStyle(document.documentElement);
+    const bg = css.getPropertyValue("--color-bg").trim() || "#0B0D10";
+    const secondary = css.getPropertyValue("--color-secondary-500").trim() || "#1F6BFF";
+
+    const secRgb = hexToRgb(secondary) ?? { r: 31, g: 107, b: 255 };
+
+    let w = 0;
+    let h = 0;
+
+    // Mouse en coords CSS (no DPR)
+    const mouse = { x: -9999, y: -9999 };
+
+    // Intensidades por celda (q,r) => [0..1]
+    const intensities = new Map<string, number>();
+
+    // Cache de path hex para dibujar rápido
+    const size = cfg.hexSize;
+    const hexPath = makeHexPath(size);
+
+    // Control animation loop
+    let raf = 0;
+    let lastT = performance.now();
+
+    const resize = () => {
+      const rect = canvas.getBoundingClientRect();
+      w = Math.max(1, Math.floor(rect.width));
+      h = Math.max(1, Math.floor(rect.height));
+
+      canvas.width = Math.floor(w * dpr);
+      canvas.height = Math.floor(h * dpr);
+      canvas.style.width = `${w}px`;
+      canvas.style.height = `${h}px`;
+
+      baseCanvas.width = canvas.width;
+      baseCanvas.height = canvas.height;
+
+      // Dibuja grid base UNA vez
+      drawBaseGrid(baseCtx, w, h, dpr, bg, cfg.baseStrokeAlpha, hexPath, size);
+    };
+
+    const onMouseMove = (e: MouseEvent) => {
+      // coords relativas al canvas
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = e.clientX - rect.left;
+      mouse.y = e.clientY - rect.top;
+    };
+
+    const onMouseLeave = () => {
+      mouse.x = -9999;
+      mouse.y = -9999;
+    };
+
+    const ro = new ResizeObserver(resize);
+    ro.observe(canvas);
+
+    window.addEventListener("mousemove", onMouseMove, { passive: true });
+    window.addEventListener("mouseout", onMouseLeave, { passive: true });
+
+    resize();
+
+    const loop = (t: number) => {
+      const dt = Math.min(0.05, (t - lastT) / 1000);
+      lastT = t;
+
+      // clear + base
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(baseCanvas, 0, 0);
+
+      // breathe (muy sutil)
+      const breathe = 1 + Math.sin(t * 0.001 * cfg.breatheSpeed) * cfg.breatheAmount;
+
+      // Resolver hex bajo ratón (axial coords)
+      const hovered = pixelToAxial(mouse.x, mouse.y, size);
+      if (hovered) {
+        const key = `${hovered.q},${hovered.r}`;
+        intensities.set(key, 1);
+      }
+
+      // Decay + dibujar glows
+      // (dibujamos solo los que tengan intensidad > 0)
+      ctx.save();
+      ctx.scale(dpr, dpr);
+
+      for (const [key, val] of intensities) {
+        const next = val - cfg.decayPerSecond * dt;
+        if (next <= 0) {
+          intensities.delete(key);
+          continue;
+        }
+        intensities.set(key, next);
+
+        const [qStr, rStr] = key.split(",");
+        const q = Number(qStr);
+        const r = Number(rStr);
+        const { x, y } = axialToPixel(q, r, size);
+
+        // glow
+        const alpha = next * cfg.glowAlpha * breathe;
+
+        // halo exterior
+        ctx.beginPath();
+        ctx.translate(x, y);
+        ctx.scale(1, 1);
+
+        // glow shadow
+        ctx.save();
+        ctx.shadowBlur = 22;
+        ctx.shadowColor = `rgba(${secRgb.r},${secRgb.g},${secRgb.b},${alpha})`;
+        ctx.strokeStyle = `rgba(${secRgb.r},${secRgb.g},${secRgb.b},${alpha})`;
+        ctx.lineWidth = 2.2;
+        ctx.stroke(hexPath);
+        ctx.restore();
+
+        // borde nítido
+        ctx.strokeStyle = `rgba(${secRgb.r},${secRgb.g},${secRgb.b},${Math.min(1, alpha + 0.15)})`;
+        ctx.lineWidth = 1.2;
+        ctx.stroke(hexPath);
+
+        // fill sutil
+        ctx.fillStyle = `rgba(${secRgb.r},${secRgb.g},${secRgb.b},${alpha * 0.08})`;
+        ctx.fill(hexPath);
+
+        // reset transform local
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      ctx.restore();
+
+      raf = requestAnimationFrame(loop);
+    };
+
+    raf = requestAnimationFrame(loop);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      ro.disconnect();
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseout", onMouseLeave);
+    };
+  }, [cfg]);
+
   return (
-    <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-[color:var(--color-bg)]">
-      {/* Haze base que "respira" */}
-      <motion.div
-        className="absolute inset-0"
-        animate={{ opacity: [0.35, 0.55, 0.35] }}
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-        style={{
-          background:
-            "radial-gradient(1200px 700px at 20% 70%, rgba(31,107,255,0.14) 0%, transparent 55%)," +
-            "radial-gradient(900px 600px at 80% 30%, rgba(31,107,255,0.10) 0%, transparent 60%)," +
-            "radial-gradient(800px 500px at 60% 85%, rgba(255,255,255,0.04) 0%, transparent 55%)",
-        }}
-      />
-
-      {/* Capa de rejilla hexagonal (SVG) */}
-      <motion.svg
-        className="absolute inset-0 h-full w-full"
-        viewBox="0 0 1440 900"
-        preserveAspectRatio="xMidYMid slice"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.8 }}
-      >
-        <defs>
-          {/* Hex pattern */}
-          <pattern
-            id="hexPattern"
-            width="72"
-            height="62.3538"
-            patternUnits="userSpaceOnUse"
-            patternTransform="translate(0 0)"
-          >
-            <path
-              d="M36 1 L71 19.1769 L71 43.1769 L36 61.3538 L1 43.1769 L1 19.1769 Z"
-              fill="none"
-              stroke="rgba(255,255,255,0.06)"
-              strokeWidth="1"
-            />
-            <path
-              d="M36 1 L36 61.3538"
-              stroke="rgba(255,255,255,0.03)"
-              strokeWidth="1"
-            />
-            <path
-              d="M1 19.1769 L71 43.1769"
-              stroke="rgba(255,255,255,0.02)"
-              strokeWidth="1"
-            />
-            <path
-              d="M71 19.1769 L1 43.1769"
-              stroke="rgba(255,255,255,0.02)"
-              strokeWidth="1"
-            />
-          </pattern>
-
-          {/* Glow (IMPORTANTE: values en una sola línea para evitar hydration mismatch) */}
-          <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="3" result="blur" />
-            <feColorMatrix
-              in="blur"
-              type="matrix"
-              values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.9 0"
-              result="glow"
-            />
-            <feMerge>
-              <feMergeNode in="glow" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
-
-          {/* Gradiente animado para trazos */}
-          <linearGradient id="traceGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="rgba(31,107,255,0.0)" />
-            <stop offset="45%" stopColor="rgba(31,107,255,0.9)" />
-            <stop offset="65%" stopColor="rgba(96,165,255,0.7)" />
-            <stop offset="100%" stopColor="rgba(31,107,255,0.0)" />
-          </linearGradient>
-
-          {/* Viñeta */}
-          <radialGradient id="vignette" r="1">
-            <stop offset="55%" stopColor="rgba(0,0,0,0)" />
-            <stop offset="100%" stopColor="rgba(0,0,0,0.55)" />
-          </radialGradient>
-
-          {/* Máscara de fade inferior */}
-          <linearGradient id="bottomFade" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="rgba(255,255,255,0.0)" />
-            <stop offset="35%" stopColor="rgba(255,255,255,0.05)" />
-            <stop offset="70%" stopColor="rgba(255,255,255,0.65)" />
-            <stop offset="100%" stopColor="rgba(255,255,255,1)" />
-          </linearGradient>
-          <mask id="maskBottom">
-            <rect width="1440" height="900" fill="url(#bottomFade)" />
-          </mask>
-        </defs>
-
-        {/* Grid base */}
-        <motion.rect
-          width="1440"
-          height="900"
-          fill="url(#hexPattern)"
-          opacity={0.9}
-          animate={{ opacity: [0.55, 0.85, 0.55] }}
-          transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
-        />
-
-        {/* Capa oscura para profundidad */}
-        <rect width="1440" height="900" fill="rgba(0,0,0,0.18)" />
-
-        {/* Trazos luminosos (zona inferior) */}
-        <g mask="url(#maskBottom)">
-          <BreathingTraces />
-        </g>
-
-        {/* Viñeta */}
-        <rect width="1440" height="900" fill="url(#vignette)" />
-      </motion.svg>
-
-      {/* Orbes flotantes */}
-      <FloatingOrb className="left-[10%] top-[65%]" size={260} delay={0} />
-      <FloatingOrb className="left-[72%] top-[20%]" size={320} delay={2.2} />
-      <FloatingOrb className="left-[55%] top-[78%]" size={220} delay={1.1} />
+    <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-transparent">
+      <canvas ref={canvasRef} className="h-full w-full" />
     </div>
   );
 };
 
-const BreathingTraces = () => {
-  return (
-    <motion.g
-      initial={{ opacity: 0.65 }}
-      animate={{ opacity: [0.45, 0.95, 0.45] }}
-      transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-    >
-      <TracePath
-        d="M120 690 L260 610 L400 690 L540 610 L680 690 L820 610 L960 690"
-        w={2.4}
-        dur={14}
-      />
-      <TracePath
-        d="M260 780 L400 700 L540 780 L680 700 L820 780 L960 700 L1100 780"
-        w={2.0}
-        dur={16}
-        delay={0.7}
-      />
-      <TracePath
-        d="M60 820 L200 740 L340 820 L480 740 L620 820 L760 740 L900 820"
-        w={1.8}
-        dur={18}
-        delay={1.2}
-      />
+/* ------------------------ helpers ------------------------ */
 
-      {[
-        [260, 610],
-        [400, 690],
-        [540, 610],
-        [680, 690],
-        [820, 610],
-        [960, 690],
-        [400, 700],
-        [680, 700],
-        [960, 700],
-        [200, 740],
-        [480, 740],
-        [760, 740],
-      ].map(([x, y], i) => (
-        <PulseNode key={`${x}-${y}-${i}`} x={x} y={y} delay={i * 0.12} />
-      ))}
-    </motion.g>
-  );
-};
+// Pointy-top hex axial <-> pixel
+function axialToPixel(q: number, r: number, size: number) {
+  const x = size * (Math.sqrt(3) * q + (Math.sqrt(3) / 2) * r);
+  const y = size * ((3 / 2) * r);
+  // desplazamos un poco para que rellene desde (0,0)
+  return { x: x + size * 2, y: y + size * 2 };
+}
 
-const TracePath = ({
-  d,
-  w,
-  dur,
-  delay = 0,
-}: {
-  d: string;
-  w: number;
-  dur: number;
-  delay?: number;
-}) => {
-  return (
-    <g filter="url(#softGlow)">
-      <path
-        d={d}
-        fill="none"
-        stroke="rgba(31,107,255,0.18)"
-        strokeWidth={w}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <motion.path
-        d={d}
-        fill="none"
-        stroke="url(#traceGrad)"
-        strokeWidth={w}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeDasharray="8 18"
-        animate={{ strokeDashoffset: [0, -80] }}
-        transition={{
-          duration: dur,
-          delay,
-          repeat: Infinity,
-          ease: "linear",
-        }}
-      />
-    </g>
-  );
-};
+function pixelToAxial(px: number, py: number, size: number) {
+  if (!Number.isFinite(px) || !Number.isFinite(py)) return null;
 
-const PulseNode = ({
-  x,
-  y,
-  delay = 0,
-}: {
-  x: number;
-  y: number;
-  delay?: number;
-}) => {
-  return (
-    <g>
-      <motion.circle
-        cx={x}
-        cy={y}
-        r={2.6}
-        fill="rgba(31,107,255,0.95)"
-        animate={{ opacity: [0.55, 1, 0.55] }}
-        transition={{
-          duration: 2.8,
-          delay,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
-      <motion.circle
-        cx={x}
-        cy={y}
-        r={14}
-        fill="rgba(31,107,255,0.18)"
-        animate={{ r: [10, 18, 10], opacity: [0.12, 0.26, 0.12] }}
-        transition={{
-          duration: 3.2,
-          delay,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
-    </g>
-  );
-};
+  // undo offset
+  const x = px - size * 2;
+  const y = py - size * 2;
 
-type FloatingOrbProps = {
-  className?: string;
-  size: number;
-  delay?: number;
-};
+  const q = ((Math.sqrt(3) / 3) * x - (1 / 3) * y) / size;
+  const r = ((2 / 3) * y) / size;
 
-const FloatingOrb = ({ className = "", size, delay = 0 }: FloatingOrbProps) => {
-  return (
-    <motion.div
-      className={`absolute ${className}`}
-      initial={{ opacity: 0.25, y: 0, scale: 1 }}
-      animate={{
-        opacity: [0.18, 0.45, 0.18],
-        y: [-10, 10, -10],
-        scale: [0.98, 1.03, 0.98],
-      }}
-      transition={{
-        duration: 10,
-        delay,
-        repeat: Infinity,
-        ease: "easeInOut",
-      }}
-    >
-      <div
-        className="rounded-full blur-3xl"
-        style={{
-          width: size,
-          height: size,
-          background:
-            "radial-gradient(circle at 30% 30%, rgba(96,165,255,0.28), rgba(31,107,255,0.12) 45%, transparent 70%)",
-        }}
-      />
-      <div
-        className="absolute inset-[18%] rounded-full"
-        style={{
-          border: "1px solid rgba(96,165,255,0.18)",
-          background: "rgba(31,107,255,0.06)",
-        }}
-      />
-    </motion.div>
-  );
-};
+  const rounded = axialRound(q, r);
+  return rounded;
+}
+
+function axialRound(q: number, r: number) {
+  // cube coords
+  let x = q;
+  let z = r;
+  let y = -x - z;
+
+  let rx = Math.round(x);
+  let ry = Math.round(y);
+  let rz = Math.round(z);
+
+  const xDiff = Math.abs(rx - x);
+  const yDiff = Math.abs(ry - y);
+  const zDiff = Math.abs(rz - z);
+
+  if (xDiff > yDiff && xDiff > zDiff) rx = -ry - rz;
+  else if (yDiff > zDiff) ry = -rx - rz;
+  else rz = -rx - ry;
+
+  // axial back: q=rx, r=rz
+  return { q: rx, r: rz };
+}
+
+function makeHexPath(size: number) {
+  const path = new Path2D();
+  // pointy-top: angle 30deg offset
+  for (let i = 0; i < 6; i++) {
+    const a = (Math.PI / 180) * (60 * i - 30);
+    const x = Math.cos(a) * size;
+    const y = Math.sin(a) * size;
+    if (i === 0) path.moveTo(x, y);
+    else path.lineTo(x, y);
+  }
+  path.closePath();
+  return path;
+}
+
+function drawBaseGrid(
+  ctx: CanvasRenderingContext2D,
+  w: number,
+  h: number,
+  dpr: number,
+  bg: string,
+  strokeAlpha: number,
+  hexPath: Path2D,
+  size: number
+) {
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+  // fondo
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+  // grid
+  ctx.save();
+  ctx.scale(dpr, dpr);
+
+  const stroke = `rgba(255,255,255,${strokeAlpha})`;
+  ctx.strokeStyle = stroke;
+  ctx.lineWidth = 1;
+
+  // Rango axial que cubra viewport
+  // Aproximación: iterar r por filas y q por columnas usando pixel bounds
+  const pad = size * 4;
+  const maxX = w + pad;
+  const maxY = h + pad;
+
+  // estimación de cuántas filas/cols hacen falta
+  const rows = Math.ceil(maxY / (size * 1.5)) + 6;
+  const cols = Math.ceil(maxX / (size * Math.sqrt(3))) + 6;
+
+  for (let r = -6; r < rows; r++) {
+    for (let q = -6; q < cols; q++) {
+      const { x, y } = axialToPixel(q, r, size);
+
+      if (x < -pad || x > w + pad || y < -pad || y > h + pad) continue;
+
+      ctx.setTransform(dpr, 0, 0, dpr, x * dpr, y * dpr);
+      // truco: Path2D se dibuja en coords locales; ya estamos posicionados
+      ctx.stroke(hexPath);
+    }
+  }
+
+  ctx.restore();
+
+  // oscurecer un pelín para profundidad
+  ctx.fillStyle = "rgba(0,0,0,0.12)";
+  ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+}
+
+function hexToRgb(hex: string) {
+  const h = hex.replace("#", "").trim();
+  if (h.length !== 6) return null;
+  const r = parseInt(h.slice(0, 2), 16);
+  const g = parseInt(h.slice(2, 4), 16);
+  const b = parseInt(h.slice(4, 6), 16);
+  if ([r, g, b].some((n) => Number.isNaN(n))) return null;
+  return { r, g, b };
+}
