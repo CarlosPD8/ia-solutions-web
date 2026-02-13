@@ -5,7 +5,7 @@ import { NeuralBackground } from "./NeuralBackground";
 
 export const MainLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="relative min-h-screen" id="inicio">
+    <div className="relative min-h-[100dvh] bg-transparent" id="inicio">
       {/* Fondo IA con conexiones neuronales */}
       <NeuralBackground />
 

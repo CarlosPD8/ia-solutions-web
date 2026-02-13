@@ -55,7 +55,7 @@
    🌐 BASE STYLES
 ========================================= */
 html, body {
-  
+  background-color: var(--color-bg); /* evita la franja blanca */
   color: var(--color-text);
   font-family: system-ui, sans-serif;
 }
