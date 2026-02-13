@@ -178,6 +178,11 @@ const AutomationPreview = () => {
   );
 };
 
+/**
+ * NUEVO preview Analytics:
+ * - Más visual: mini “dashboard” con barras + línea + donut
+ * - Animación suave (respira y recorre la línea) sin punto flotante raro
+ */
 const AnalyticsPreview = () => {
   return (
     <div className="space-y-3">
@@ -185,29 +190,105 @@ const AnalyticsPreview = () => {
         <span>Analytics</span>
         <span className="text-secondary">+18%</span>
       </div>
-      <div className="relative h-20 w-full">
-        <div className="absolute inset-0 rounded-lg border border-default" />
-        <svg className="absolute inset-2 h-[calc(100%-16px)] w-[calc(100%-16px)]">
-          <polyline
-            fill="none"
-            stroke="rgba(31,107,255,0.8)"
-            strokeWidth="1.5"
-            points="0,40 30,32 60,36 90,20 120,26 150,12"
-          />
-        </svg>
-        <motion.div
-          className="absolute"
-          style={{ left: "70%", top: "24%" }}
-          animate={{ scale: [1, 1.3, 1] }}
-          transition={{
-            duration: 1.8,
-            repeat: Infinity,
-            ease: [0.22, 0.61, 0.36, 1],
-          }}
-        >
-          <div className="h-2 w-2 rounded-full bg-secondary" />
-          <div className="h-5 w-5 rounded-full bg-[color:var(--color-secondary-500)]/40 blur-sm" />
-        </motion.div>
+
+      <div className="relative grid h-20 grid-cols-[1fr_72px] gap-3">
+        {/* panel gráfico */}
+        <div className="relative overflow-hidden rounded-xl border border-default bg-[color:var(--color-primary-900)]/70 p-2">
+          {/* rejilla sutil */}
+          <div className="absolute inset-0 opacity-70">
+            <div className="h-full w-full bg-[linear-gradient(to_right,rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.035)_1px,transparent_1px)] bg-[size:16px_16px]" />
+          </div>
+
+          {/* barras + línea */}
+          <div className="relative h-full">
+            <div className="absolute bottom-1 left-1 right-1 flex items-end gap-1">
+              {[10, 18, 14, 24, 20, 30, 26].map((v, i) => (
+                <motion.div
+                  key={i}
+                  className="w-full rounded-sm bg-[color:var(--color-secondary-500)]/25"
+                  style={{ height: `${v}px` }}
+                  animate={{ opacity: [0.45, 0.8, 0.45] }}
+                  transition={{
+                    duration: 3.6,
+                    delay: i * 0.12,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                />
+              ))}
+            </div>
+
+            <svg className="relative h-full w-full">
+              <path
+                d="M6 54 C 24 48, 34 50, 50 40 S 82 34, 98 26 S 122 30, 136 18"
+                fill="none"
+                stroke="rgba(31,107,255,0.55)"
+                strokeWidth="1.6"
+              />
+              <motion.path
+                d="M6 54 C 24 48, 34 50, 50 40 S 82 34, 98 26 S 122 30, 136 18"
+                fill="none"
+                stroke="rgba(96,165,255,0.95)"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeDasharray="10 14"
+                animate={{ strokeDashoffset: [0, -80] }}
+                transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
+              />
+            </svg>
+
+            {/* glow sweep */}
+            <motion.div
+              className="pointer-events-none absolute -inset-6 opacity-50"
+              animate={{ opacity: [0.18, 0.42, 0.18] }}
+              transition={{ duration: 5.2, repeat: Infinity, ease: "easeInOut" }}
+              style={{
+                background:
+                  "radial-gradient(220px 80px at 70% 30%, rgba(31,107,255,0.22), transparent 60%)",
+              }}
+            />
+          </div>
+        </div>
+
+        {/* donut / KPI */}
+        <div className="relative overflow-hidden rounded-xl border border-default bg-[color:var(--color-primary-900)]/70 p-2">
+          <div className="flex h-full flex-col items-center justify-center">
+            <div className="relative h-10 w-10">
+              <svg viewBox="0 0 36 36" className="h-full w-full">
+                <path
+                  d="M18 2 a 16 16 0 1 1 0 32 a 16 16 0 1 1 0 -32"
+                  fill="none"
+                  stroke="rgba(255,255,255,0.08)"
+                  strokeWidth="3.2"
+                />
+                <motion.path
+                  d="M18 2 a 16 16 0 1 1 0 32 a 16 16 0 1 1 0 -32"
+                  fill="none"
+                  stroke="rgba(96,165,255,0.95)"
+                  strokeWidth="3.2"
+                  strokeLinecap="round"
+                  strokeDasharray="78 100"
+                  animate={{ strokeDasharray: ["62 100", "78 100", "62 100"] }}
+                  transition={{
+                    duration: 4.4,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                />
+              </svg>
+              <motion.div
+                className="absolute inset-0 rounded-full"
+                animate={{ opacity: [0.15, 0.4, 0.15] }}
+                transition={{ duration: 4.4, repeat: Infinity, ease: "easeInOut" }}
+                style={{
+                  boxShadow: "0 0 22px rgba(31,107,255,0.35)",
+                }}
+              />
+            </div>
+            <div className="mt-1 text-[10px] font-medium text-primary">CTR</div>
+            <div className="text-[10px] text-secondary">+18%</div>
+          </div>
+        </div>
       </div>
     </div>
   );

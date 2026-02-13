@@ -37,7 +37,10 @@ const cardVariants: Variants = {
 
 export const HowItWorksSection = ({ steps }: Props) => {
   return (
-    <section id="como-funciona" className="border-b border-default bg-transparent">
+    <section
+      id="como-funciona"
+      className="border-b border-default bg-transparent"
+    >
       <motion.div
         className="mx-auto max-w-6xl px-4 py-14"
         variants={containerVariants}
@@ -62,8 +65,8 @@ export const HowItWorksSection = ({ steps }: Props) => {
               className="card group relative flex flex-col rounded-3xl p-5 transition-all hover:-translate-y-2 hover:border-[color:var(--color-secondary-400)] hover:shadow-[0_0_30px_rgba(31,107,255,0.25)]"
               variants={cardVariants}
             >
-              {/* Panel superior oscuro con animación por paso */}
-              <div className="mb-4 h-32 rounded-2xl border border-default bg-[color:var(--color-primary-900)] px-4 py-3 text-primary">
+              {/* Panel superior (sin “doble tarjeta”) */}
+              <div className="mb-4 overflow-hidden rounded-2xl border border-default bg-[color:var(--color-primary-900)] px-4 py-3 text-primary shadow-inner">
                 {renderStepPreview(index)}
               </div>
 
@@ -72,7 +75,9 @@ export const HowItWorksSection = ({ steps }: Props) => {
                 <p className="text-xs font-mono uppercase tracking-[0.2em] text-secondary">
                   {String(index + 1).padStart(2, "0")}.
                 </p>
-                <h3 className="text-sm font-semibold text-primary">{step.title}</h3>
+                <h3 className="text-sm font-semibold text-primary">
+                  {step.title}
+                </h3>
                 <p className="text-xs text-muted">{step.description}</p>
               </div>
             </motion.article>
@@ -172,7 +177,7 @@ const ProposalPreview = () => {
   );
 };
 
-/* Paso 3: desarrollo */
+/* Paso 3: desarrollo (FIX: sin tarjeta extra + cursor dentro) */
 const DevelopmentPreview = () => {
   return (
     <div className="flex h-full flex-col justify-between">
@@ -182,7 +187,9 @@ const DevelopmentPreview = () => {
           Agile
         </span>
       </div>
-      <div className="relative flex-1 rounded-xl bg-[color:var(--color-primary-900)]/70 p-3 text-[10px] font-mono text-primary">
+
+      {/* Un solo “panel” limpio, con overflow-hidden para que nada se salga */}
+      <div className="relative flex-1 overflow-hidden rounded-xl border border-default bg-[color:var(--color-primary-900)]/70 p-3 text-[10px] font-mono text-primary">
         <p>
           <span className="text-secondary">
             {"const result = await runPipeline({"}
@@ -190,12 +197,27 @@ const DevelopmentPreview = () => {
         </p>
         <p className="ml-4 text-muted">{"input,"}</p>
         <p className="ml-4 text-muted">{'model: "enterprise-ia",'} </p>
-        <p className="ml-4 text-muted">{'callbacks: ["logging", "metrics"]'}</p>
+        <p className="ml-4 text-muted">
+          {'callbacks: ["logging", "metrics"]'}
+        </p>
         <p>{"});"}</p>
+
+        {/* Cursor dentro del panel (no se sale) */}
         <motion.span
-          className="absolute bottom-2 left-3 h-3 w-[1px] bg-secondary"
+          className="absolute bottom-3 left-3 h-3 w-[1px] bg-secondary"
           animate={{ opacity: [0, 1, 0] }}
           transition={{ duration: 1, repeat: Infinity }}
+        />
+
+        {/* Glow sutil interno, recortado */}
+        <motion.div
+          className="pointer-events-none absolute -inset-10 opacity-60"
+          animate={{ opacity: [0.25, 0.5, 0.25] }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+          style={{
+            background:
+              "radial-gradient(220px 80px at 35% 30%, rgba(31,107,255,0.18), transparent 60%)",
+          }}
         />
       </div>
     </div>
