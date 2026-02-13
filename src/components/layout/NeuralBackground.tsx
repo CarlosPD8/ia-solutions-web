@@ -1,3 +1,4 @@
+// src/components/layout/NeuralBackground.tsx
 "use client";
 
 import { motion } from "framer-motion";
@@ -10,7 +11,7 @@ import { motion } from "framer-motion";
  */
 export const NeuralBackground = () => {
   return (
-    <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-slate-50">
+    <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-[color:var(--color-bg)]">
       {/* Red principal en SVG */}
       <motion.svg
         className="absolute inset-0 h-full w-full opacity-80"
@@ -21,13 +22,13 @@ export const NeuralBackground = () => {
       >
         <defs>
           <linearGradient id="neural-line" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#22c55e" stopOpacity="0.25" />
-            <stop offset="50%" stopColor="#22c55e" stopOpacity="0.7" />
-            <stop offset="100%" stopColor="#38bdf8" stopOpacity="0.4" />
+            <stop offset="0%" stopColor="#1F6BFF" stopOpacity="0.18" />
+            <stop offset="50%" stopColor="#1F6BFF" stopOpacity="0.55" />
+            <stop offset="100%" stopColor="#60A5FF" stopOpacity="0.35" />
           </linearGradient>
           <radialGradient id="neural-node" r="1">
-            <stop offset="0%" stopColor="#a7f3d0" stopOpacity="0.9" />
-            <stop offset="100%" stopColor="#a7f3d0" stopOpacity="0" />
+            <stop offset="0%" stopColor="#A7C7FF" stopOpacity="0.75" />
+            <stop offset="100%" stopColor="#A7C7FF" stopOpacity="0" />
           </radialGradient>
         </defs>
 
@@ -85,14 +86,8 @@ export const NeuralBackground = () => {
           [1260, 720],
         ].map(([x, y], i) => (
           <g key={`${x}-${y}-${i}`}>
-            <circle cx={x} cy={y} r={3} fill="#22c55e" fillOpacity={0.95} />
-            <circle
-              cx={x}
-              cy={y}
-              r={16}
-              fill="url(#neural-node)"
-              opacity={0.9}
-            />
+            <circle cx={x} cy={y} r={3} fill="#1F6BFF" fillOpacity={0.95} />
+            <circle cx={x} cy={y} r={16} fill="url(#neural-node)" opacity={0.9} />
           </g>
         ))}
       </motion.svg>
@@ -130,11 +125,11 @@ const FloatingNode = ({
       }}
     >
       <div
-        className="rounded-full bg-emerald-200/50 blur-2xl"
+        className="rounded-full bg-[color:var(--color-secondary-500)]/18 blur-2xl"
         style={{ width: size, height: size }}
       />
-      <div className="absolute inset-6 rounded-full border border-emerald-300/70 bg-emerald-50/60" />
-      <div className="absolute inset-[35%] rounded-full bg-emerald-400/80 blur-md" />
+      <div className="absolute inset-6 rounded-full border border-[color:var(--color-secondary-300)]/55 bg-[color:var(--color-secondary-500)]/10" />
+      <div className="absolute inset-[35%] rounded-full bg-[color:var(--color-secondary-400)]/80 blur-md" />
     </motion.div>
   );
 };

@@ -1,3 +1,4 @@
+// src/components/home/CtaSection.tsx
 "use client";
 
 import { motion } from "framer-motion";
@@ -19,10 +20,10 @@ export const CtaSection = ({ title, description, buttonText }: Props) => {
       transition={{ duration: 0.6, ease: [0.22, 0.61, 0.36, 1] }}
     >
       <div className="mx-auto max-w-6xl px-4">
-        <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white/80 p-8 shadow-[0_20px_60px_rgba(15,23,42,0.08)] md:flex md:items-center md:justify-between md:gap-8">
+        <div className="card relative overflow-hidden rounded-3xl p-8 md:flex md:items-center md:justify-between md:gap-8">
           {/* halo de luz */}
           <motion.div
-            className="pointer-events-none absolute -left-10 top-0 h-40 w-40 rounded-full bg-emerald-200/60 blur-3xl"
+            className="pointer-events-none absolute -left-10 top-0 h-40 w-40 rounded-full bg-[color:var(--color-secondary-500)]/35 blur-3xl"
             animate={{
               x: [0, 20, 0],
               y: [0, 10, -5],
@@ -36,16 +37,16 @@ export const CtaSection = ({ title, description, buttonText }: Props) => {
           />
 
           <div className="relative space-y-3">
-            <h2 className="text-2xl font-semibold tracking-tight text-slate-900">
+            <h2 className="text-2xl font-semibold tracking-tight text-primary">
               {title}
             </h2>
-            <p className="max-w-xl text-sm text-slate-600">{description}</p>
+            <p className="max-w-xl text-sm text-muted">{description}</p>
           </div>
 
           <div className="relative mt-6 md:mt-0">
             <a
               href="/contacto"
-              className="inline-flex items-center justify-center rounded-full bg-emerald-500 px-6 py-2.5 text-sm font-medium text-white shadow-[0_18px_45px_rgba(16,185,129,0.35)] transition-colors hover:bg-emerald-600"
+              className="btn-primary inline-flex items-center justify-center rounded-full px-6 py-2.5 text-sm font-medium"
             >
               {buttonText}
             </a>
