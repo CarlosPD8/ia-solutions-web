@@ -4,43 +4,27 @@
 import { motion } from "framer-motion";
 import { useEffect, useMemo, useRef } from "react";
 
-/**
- * NeuralBackground (Canvas)
- * - Fondo negro
- * - Red de partículas + conexiones (azul eléctrico)
- * - Se ilumina y “se mueve” alrededor del ratón
- * - Animación suave tipo “respira”
- *
- * Colores desde CSS vars:
- *  - --color-bg (fallback negro)
- *  - --color-secondary-500 (azul)
- */
 export const NeuralBackground = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const cfg = useMemo(
     () => ({
-      // densidad aproximada: más bajo = más puntos
-      density: 14000, // px^2 por punto
+      density: 14000,
       maxPoints: 140,
       minPoints: 60,
 
-      // física
       speed: 0.22,
       wander: 0.08,
       edgeBounce: 1,
 
-      // conexiones
       linkDist: 140,
       linkDistNearMouse: 210,
 
-      // ratón
       mouseInfluenceRadius: 220,
-      mouseAttract: 0.018, // atracción al cursor
-      mouseRepel: 0.02, // repulsión si muy cerca
+      mouseAttract: 0.018,
+      mouseRepel: 0.02,
       mouseRepelRadius: 55,
 
-      // dibujo
       pointSize: 1.2,
       pointSizeNearMouse: 2.0,
       baseLineAlpha: 0.18,
@@ -48,12 +32,13 @@ export const NeuralBackground = () => {
       basePointAlpha: 0.55,
       glowPointAlpha: 0.95,
 
-      // “respirar”
       breatheSpeed: 0.0008,
       breatheAmp: 0.22,
 
-      // blur/glow
       glowBlur: 14,
+
+      // ✅ NUEVO: hard caps para rendimiento
+      maxLinksPerFrame: 2200, // limita líneas dibujadas por frame
     }),
     []
   );
@@ -70,12 +55,23 @@ export const NeuralBackground = () => {
     const blue = (css.getPropertyValue("--color-secondary-500") || "").trim() || "#1F6BFF";
     const blueRGB = hexToRgb(blue) ?? { r: 31, g: 107, b: 255 };
 
-    const clampDpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
-    let dpr = clampDpr;
+    // ✅ Detectar móvil / iOS (y/o dispositivos lentos)
+    const isTouch = typeof window !== "undefined" && ("ontouchstart" in window || navigator.maxTouchPoints > 0);
+    const isIOS = typeof navigator !== "undefined" && /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const lowPower = isTouch || isIOS;
 
+    // ✅ DPR: en móvil fijamos 1 para evitar render pesado
+    const getDpr = () => {
+      const raw = window.devicePixelRatio || 1;
+      if (lowPower) return 1; // clave para iPhone 11
+      return Math.max(1, Math.min(2, raw));
+    };
+
+    let dpr = getDpr();
     let w = 1;
     let h = 1;
 
+    // mouse (en móvil casi siempre inactive, pero dejamos por si iPad/trackpad)
     const mouse = { x: -9999, y: -9999, active: false };
 
     type P = { x: number; y: number; vx: number; vy: number; seed: number };
@@ -88,18 +84,22 @@ export const NeuralBackground = () => {
       w = Math.max(1, Math.floor(rect.width));
       h = Math.max(1, Math.floor(rect.height));
 
-      dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+      dpr = getDpr();
 
       canvas.width = Math.floor(w * dpr);
       canvas.height = Math.floor(h * dpr);
       canvas.style.width = `${w}px`;
       canvas.style.height = `${h}px`;
 
-      // recalcular nº de puntos por área
-      const target = Math.round((w * h) / cfg.density);
-      const count = Math.max(cfg.minPoints, Math.min(cfg.maxPoints, target));
+      // ✅ En lowPower: menos puntos y menos densidad de red
+      const baseDensity = cfg.density;
+      const density = lowPower ? baseDensity * 1.6 : baseDensity; // menos puntos en móvil
+      const target = Math.round((w * h) / density);
 
-      // mantener puntos si ya hay, ajustando cantidad
+      const maxP = lowPower ? Math.min(90, cfg.maxPoints) : cfg.maxPoints;
+      const minP = lowPower ? Math.min(40, cfg.minPoints) : cfg.minPoints;
+      const count = Math.max(minP, Math.min(maxP, target));
+
       if (points.length === 0) {
         points = new Array(count).fill(0).map((_, i) => ({
           x: Math.random() * w,
@@ -142,16 +142,27 @@ export const NeuralBackground = () => {
     window.addEventListener("mousemove", onMove, { passive: true });
     window.addEventListener("mouseout", onLeave, { passive: true });
 
+    // ✅ Pausar cuando la pestaña no está visible
+    let running = true;
+    const onVis = () => {
+      running = document.visibilityState === "visible";
+    };
+    document.addEventListener("visibilitychange", onVis);
+
     resize();
 
     let raf = 0;
     let last = performance.now();
 
     const loop = (t: number) => {
+      if (!running) {
+        raf = requestAnimationFrame(loop);
+        return;
+      }
+
       const dt = Math.min(0.05, (t - last) / 1000);
       last = t;
 
-      // breathe factor 0.8..1.2
       const breathe = 1 + Math.sin(t * cfg.breatheSpeed) * cfg.breatheAmp;
 
       // clear
@@ -162,16 +173,18 @@ export const NeuralBackground = () => {
       ctx.save();
       ctx.scale(dpr, dpr);
 
+      // ✅ En lowPower: menos blur (lo más caro)
+      const glowBlur = lowPower ? 6 : cfg.glowBlur;
+
       // update points
+      const speedMul = lowPower ? 0.85 : 1; // un pelín menos movimiento en móvil
       for (let i = 0; i < points.length; i++) {
         const p = points[i];
 
-        // tiny wander
         const ang = (t * 0.0003 + p.seed) * Math.PI * 2;
         p.vx += Math.cos(ang) * cfg.wander * dt;
         p.vy += Math.sin(ang) * cfg.wander * dt;
 
-        // mouse influence
         if (mouse.active) {
           const dx = mouse.x - p.x;
           const dy = mouse.y - p.y;
@@ -184,7 +197,6 @@ export const NeuralBackground = () => {
             const nx = dx / d;
             const ny = dy / d;
 
-            // attract (far) / repel (very close)
             if (d < cfg.mouseRepelRadius) {
               const f = (1 - d / cfg.mouseRepelRadius) * cfg.mouseRepel;
               p.vx -= nx * f;
@@ -197,7 +209,6 @@ export const NeuralBackground = () => {
           }
         }
 
-        // limit speed gently
         const v = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
         const vmax = cfg.speed * 2.2;
         if (v > vmax) {
@@ -205,10 +216,9 @@ export const NeuralBackground = () => {
           p.vy = (p.vy / v) * vmax;
         }
 
-        p.x += p.vx * (60 * dt);
-        p.y += p.vy * (60 * dt);
+        p.x += p.vx * (60 * dt) * speedMul;
+        p.y += p.vy * (60 * dt) * speedMul;
 
-        // bounce edges
         if (p.x < 0) {
           p.x = 0;
           p.vx = Math.abs(p.vx) * cfg.edgeBounce;
@@ -225,11 +235,13 @@ export const NeuralBackground = () => {
         }
       }
 
-      // links
-      const baseLink = cfg.linkDist * breathe;
-      const nearLink = cfg.linkDistNearMouse * breathe;
+      // ✅ En lowPower: reduce distancias de enlace (menos líneas)
+      const baseLink = (lowPower ? cfg.linkDist * 0.82 : cfg.linkDist) * breathe;
+      const nearLink = (lowPower ? cfg.linkDistNearMouse * 0.82 : cfg.linkDistNearMouse) * breathe;
 
-      // draw lines (two-pass glow)
+      let linksDrawn = 0;
+
+      // links
       for (let i = 0; i < points.length; i++) {
         const a = points[i];
 
@@ -238,20 +250,21 @@ export const NeuralBackground = () => {
           : false;
 
         const linkLimit = aNear ? nearLink : baseLink;
+        const lim2 = linkLimit * linkLimit;
 
         for (let j = i + 1; j < points.length; j++) {
+          if (linksDrawn >= cfg.maxLinksPerFrame) break;
+
           const b = points[j];
           const dx = a.x - b.x;
           const dy = a.y - b.y;
           const d2 = dx * dx + dy * dy;
-          const lim2 = linkLimit * linkLimit;
 
           if (d2 > lim2) continue;
 
           const d = Math.sqrt(d2);
-          const p = 1 - d / linkLimit;
+          const pwr = 1 - d / linkLimit;
 
-          // extra glow if near mouse
           let glowBoost = 0;
           if (mouse.active) {
             const am = dist(a.x, a.y, mouse.x, mouse.y);
@@ -260,13 +273,14 @@ export const NeuralBackground = () => {
             if (m < cfg.mouseInfluenceRadius) glowBoost = (1 - m / cfg.mouseInfluenceRadius) * 0.9;
           }
 
-          const alpha = (cfg.baseLineAlpha * p + cfg.glowLineAlpha * glowBoost * p) * 0.9;
+          const alpha =
+            (cfg.baseLineAlpha * pwr + cfg.glowLineAlpha * glowBoost * pwr) * 0.9;
 
           if (alpha <= 0.01) continue;
 
-          // glow
           ctx.save();
-          ctx.shadowBlur = cfg.glowBlur * (0.5 + glowBoost);
+          // ✅ shadowBlur reducido en móvil
+          ctx.shadowBlur = glowBlur * (0.5 + glowBoost);
           ctx.shadowColor = `rgba(${blueRGB.r},${blueRGB.g},${blueRGB.b},${Math.min(
             1,
             0.55 * alpha
@@ -278,6 +292,8 @@ export const NeuralBackground = () => {
           ctx.lineTo(b.x, b.y);
           ctx.stroke();
           ctx.restore();
+
+          linksDrawn++;
         }
       }
 
@@ -294,9 +310,8 @@ export const NeuralBackground = () => {
         const r = cfg.pointSize + near * (cfg.pointSizeNearMouse - cfg.pointSize);
         const a = (cfg.basePointAlpha + near * (cfg.glowPointAlpha - cfg.basePointAlpha)) * 0.9;
 
-        // glow dot
         ctx.save();
-        ctx.shadowBlur = cfg.glowBlur * (0.5 + near);
+        ctx.shadowBlur = glowBlur * (0.5 + near);
         ctx.shadowColor = `rgba(${blueRGB.r},${blueRGB.g},${blueRGB.b},${0.55 * a})`;
         ctx.fillStyle = `rgba(${blueRGB.r},${blueRGB.g},${blueRGB.b},${a})`;
         ctx.beginPath();
@@ -305,8 +320,15 @@ export const NeuralBackground = () => {
         ctx.restore();
       }
 
-      // subtle vignette
-      const grad = ctx.createRadialGradient(w * 0.5, h * 0.5, Math.min(w, h) * 0.1, w * 0.5, h * 0.5, Math.max(w, h) * 0.75);
+      // vignette
+      const grad = ctx.createRadialGradient(
+        w * 0.5,
+        h * 0.5,
+        Math.min(w, h) * 0.1,
+        w * 0.5,
+        h * 0.5,
+        Math.max(w, h) * 0.75
+      );
       grad.addColorStop(0, "rgba(0,0,0,0)");
       grad.addColorStop(1, "rgba(0,0,0,0.55)");
       ctx.fillStyle = grad;
@@ -324,6 +346,7 @@ export const NeuralBackground = () => {
       ro.disconnect();
       window.removeEventListener("mousemove", onMove);
       window.removeEventListener("mouseout", onLeave);
+      document.removeEventListener("visibilitychange", onVis);
     };
   }, [cfg]);
 
@@ -335,7 +358,6 @@ export const NeuralBackground = () => {
       transition={{ duration: 0.6 }}
     >
       <canvas ref={canvasRef} className="h-full w-full" />
-      {/* haze muy suave para dar profundidad (sin cambiar el fondo negro) */}
       <motion.div
         className="absolute inset-0"
         animate={{ opacity: [0.12, 0.22, 0.12] }}
@@ -350,8 +372,6 @@ export const NeuralBackground = () => {
     </motion.div>
   );
 };
-
-/* ----------------- helpers ----------------- */
 
 function dist(x1: number, y1: number, x2: number, y2: number) {
   const dx = x1 - x2;
