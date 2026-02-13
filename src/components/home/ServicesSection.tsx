@@ -3,7 +3,7 @@
 
 import { motion, type Variants } from "framer-motion";
 import { Service } from "@/core/domain/service";
-import { enterBlurUp, stagger } from "@/components/motion/presets";
+import { enterBlurUp, stagger, easeApple } from "@/components/motion/presets";
 
 type Props = {
   services: Service[];
@@ -11,7 +11,15 @@ type Props = {
 
 const containerVariants: Variants = stagger(0.08, 0.06);
 
-const cardEnter: Variants = enterBlurUp;
+// ✅ Card enter SIN filter para evitar “flash/repaint”
+const cardEnterNoFilter: Variants = {
+  hidden: { opacity: 0, y: 22 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.8, ease: easeApple },
+  },
+};
 
 export const ServicesSection = ({ services }: Props) => {
   return (
@@ -23,7 +31,8 @@ export const ServicesSection = ({ services }: Props) => {
         whileInView="show"
         viewport={{ once: true, amount: 0.25 }}
       >
-        <motion.div className="mb-8 space-y-3" variants={cardEnter}>
+        {/* ✅ Aquí sí dejamos blur */}
+        <motion.div className="mb-8 space-y-3" variants={enterBlurUp}>
           <h2 className="text-2xl font-semibold tracking-tight text-primary">
             Servicios de IA para tu empresa
           </h2>
@@ -38,8 +47,10 @@ export const ServicesSection = ({ services }: Props) => {
           {services.map((service, index) => (
             <motion.article
               key={service.id}
-              className="card group relative flex h-full flex-col rounded-3xl p-4 transition-all hover:-translate-y-2 hover:border-[color:var(--color-secondary-400)] hover:shadow-[0_0_30px_rgba(31,107,255,0.25)]"
-              variants={cardEnter}
+              variants={cardEnterNoFilter}
+              whileHover={{ y: -8 }}
+              transition={{ duration: 0.35, ease: easeApple }}
+              className="card group relative flex h-full flex-col rounded-3xl p-4 will-change-transform hover:border-[color:var(--color-secondary-400)] hover:shadow-[0_0_30px_rgba(31,107,255,0.25)]"
             >
               {/* Panel interactivo superior (INTACTO) */}
               <div className="mb-4 rounded-2xl border border-default bg-[color:var(--color-primary-900)] px-4 py-3 text-primary shadow-inner">
@@ -86,6 +97,7 @@ function renderServicePreview(serviceId: string) {
   if (serviceId === "analytics") return <AnalyticsPreview />;
   return <DefaultPreview />;
 }
+
 
 const ChatbotPreview = () => {
   return (

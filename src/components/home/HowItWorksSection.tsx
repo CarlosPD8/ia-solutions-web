@@ -2,17 +2,29 @@
 "use client";
 
 import { motion, type Variants } from "framer-motion";
-import { enterBlurUp, stagger } from "@/components/motion/presets";
+import { enterBlurUp, stagger, easeApple } from "@/components/motion/presets";
 
 type Step = { id: string; title: string; description: string };
 type Props = { steps: Step[] };
 
 const containerVariants: Variants = stagger(0.08, 0.06);
-const cardEnter: Variants = enterBlurUp;
+
+// ✅ Card enter SIN filter para evitar “flash/repaint” al terminar
+const cardEnterNoFilter: Variants = {
+  hidden: { opacity: 0, y: 22 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.8, ease: easeApple },
+  },
+};
 
 export const HowItWorksSection = ({ steps }: Props) => {
   return (
-    <section id="como-funciona" className="border-b border-default bg-transparent">
+    <section
+      id="como-funciona"
+      className="border-b border-default bg-transparent"
+    >
       <motion.div
         className="mx-auto max-w-6xl px-4 py-14"
         variants={containerVariants}
@@ -20,7 +32,8 @@ export const HowItWorksSection = ({ steps }: Props) => {
         whileInView="show"
         viewport={{ once: true, amount: 0.25 }}
       >
-        <motion.div className="mb-8 space-y-3" variants={cardEnter}>
+        {/* ✅ Aquí sí dejamos blur (no suele dar problemas) */}
+        <motion.div className="mb-8 space-y-3" variants={enterBlurUp}>
           <h2 className="text-2xl font-semibold tracking-tight text-primary">
             Cómo trabajamos contigo
           </h2>
@@ -34,8 +47,11 @@ export const HowItWorksSection = ({ steps }: Props) => {
           {steps.map((step, index) => (
             <motion.article
               key={step.id}
-              className="card group relative flex flex-col rounded-3xl p-5 transition-all hover:-translate-y-2 hover:border-[color:var(--color-secondary-400)] hover:shadow-[0_0_30px_rgba(31,107,255,0.25)]"
-              variants={cardEnter}
+              variants={cardEnterNoFilter}
+              // ✅ Lift por Framer (sin conflicto con transform)
+              whileHover={{ y: -8 }}
+              transition={{ duration: 0.35, ease: easeApple }}
+              className="card group relative flex flex-col rounded-3xl p-5 will-change-transform hover:border-[color:var(--color-secondary-400)] hover:shadow-[0_0_30px_rgba(31,107,255,0.25)]"
             >
               {/* Panel superior (INTACTO) */}
               <div className="mb-4 overflow-hidden rounded-2xl border border-default bg-[color:var(--color-primary-900)] px-4 py-3 text-primary shadow-inner">
@@ -47,7 +63,9 @@ export const HowItWorksSection = ({ steps }: Props) => {
                 <p className="text-xs font-mono uppercase tracking-[0.2em] text-secondary">
                   {String(index + 1).padStart(2, "0")}.
                 </p>
-                <h3 className="text-sm font-semibold text-primary">{step.title}</h3>
+                <h3 className="text-sm font-semibold text-primary">
+                  {step.title}
+                </h3>
                 <p className="text-xs text-muted">{step.description}</p>
               </div>
             </motion.article>
