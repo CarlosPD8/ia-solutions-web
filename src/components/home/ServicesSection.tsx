@@ -42,7 +42,7 @@ export const ServicesSection = ({ services }: Props) => {
         variants={containerVariants}
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, amount: 0.45, margin: "0px 0px -15% 0px" }}
+        viewport={{ once: true, amount: 0.25 }}
       >
         <div className="mb-8 space-y-3">
           <h2 className="text-2xl font-semibold tracking-tight text-primary">
