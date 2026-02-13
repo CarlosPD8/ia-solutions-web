@@ -189,7 +189,7 @@ export const NeuralBackground = () => {
   }, [cfg]);
 
   return (
-    <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-transparent">
+    <div className="pointer-events-none fixed inset-0 -z-0 overflow-hidden bg-transparent">
       <canvas ref={canvasRef} className="h-full w-full" />
     </div>
   );

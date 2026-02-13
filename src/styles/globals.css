@@ -54,11 +54,18 @@
 /* =========================================
    🌐 BASE STYLES
 ========================================= */
-html, body {
-
-  color: var(--color-text);
-  font-family: system-ui, sans-serif;
+html {
+  background-color: var(--color-bg); /* evita franja blanca sin tapar el fondo */
+  height: 100%;
 }
+
+body {
+  background: transparent; /* importante */
+  min-height: 100%;
+  color: var(--color-text);
+  overscroll-behavior: none; /* evita “bounce” blanco */
+}
+
 
 a {
   color: var(--color-secondary-400);
