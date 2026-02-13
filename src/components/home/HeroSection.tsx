@@ -53,7 +53,9 @@ export const HeroSection = ({
             variants={enterBlurUp}
           >
             <a
-              href="#contacto"
+              href="https://wa.me/34670294712?text=Hola%20quiero%20información%20sobre%20una%20solución%20de%20IA"
+              target="_blank"
+              rel="noopener noreferrer"
               className="btn-primary inline-flex items-center justify-center rounded-full px-5 py-2.5 text-sm font-medium"
             >
               {primaryCta}

@@ -85,7 +85,9 @@ export const Footer = () => {
             </ul>
 
             <a
-              href="#contacto"
+              href="https://wa.me/34670294712?text=Hola%20quiero%20información%20sobre%20una%20solución%20de%20IA"
+              target="_blank"
+              rel="noopener noreferrer"
               className="btn-primary mt-4 inline-flex rounded-full px-4 py-2 text-xs font-medium"
             >
               Pedir cita
