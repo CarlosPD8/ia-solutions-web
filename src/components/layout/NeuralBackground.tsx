@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 
 /**
  * Fondo con conexiones tipo "red neuronal":
- * - Base clara
+ * - Base 
  * - Red de líneas y nodos en SVG
  * - Nodos flotantes que dan sensación de movimiento
  */
