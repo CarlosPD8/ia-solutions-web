@@ -82,13 +82,18 @@ export const IconOrbit = ({ compact = false }: { compact?: boolean }) => {
   const quality = !compact && !reduceMotion;
 
   const onPointerDown: PointerEventHandler<HTMLDivElement> = (event) => {
+    if (event.pointerType === "mouse" && event.button !== 0) return;
+
     dragState.current = {
       active: true,
       pointerId: event.pointerId,
       lastX: event.clientX,
       lastY: event.clientY,
     };
-    event.currentTarget.setPointerCapture(event.pointerId);
+
+    if (event.pointerType !== "mouse") {
+      event.currentTarget.setPointerCapture(event.pointerId);
+    }
   };
 
   const onPointerMove: PointerEventHandler<HTMLDivElement> = (event) => {
@@ -117,7 +122,7 @@ export const IconOrbit = ({ compact = false }: { compact?: boolean }) => {
     if (state.pointerId === event.pointerId) {
       dragState.current.active = false;
       dragState.current.pointerId = -1;
-      if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      if (event.pointerType !== "mouse" && event.currentTarget.hasPointerCapture(event.pointerId)) {
         event.currentTarget.releasePointerCapture(event.pointerId);
       }
     }
@@ -126,7 +131,7 @@ export const IconOrbit = ({ compact = false }: { compact?: boolean }) => {
   return (
     <div
       className="relative mx-auto h-[23rem] w-full max-w-[32rem] cursor-grab active:cursor-grabbing md:h-[28rem]"
-      style={{ touchAction: "none" }}
+      style={{ touchAction: compact ? "none" : "pan-y" }}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={endPointerDrag}
@@ -275,20 +280,9 @@ const SolarSystem = ({
   return (
     <>
     <group ref={rigRef} scale={compact ? SYSTEM_SCALE_MOBILE : SYSTEM_SCALE_DESKTOP}>
-      <mesh position={[0, -0.28, -0.1]} rotation-x={-Math.PI / 2}>
-        <circleGeometry args={[3.15, quality ? 120 : 84]} />
-        <meshBasicMaterial map={sceneHalo} transparent opacity={0.34} depthWrite={false} depthTest={false} />
-      </mesh>
-
-      <mesh position={[0, BASE_RING_Y - 0.04, 0]} rotation-x={Math.PI / 2}>
-        <ringGeometry args={[BASE_RING_RADIUS * 0.66, BASE_RING_RADIUS * 1.6, quality ? 140 : 84]} />
-        <meshBasicMaterial
-          color="#6ca4ff"
-          transparent
-          opacity={0.08}
-          side={THREE.DoubleSide}
-          depthWrite={false}
-        />
+      <mesh position={[0, -0.34, -0.1]} rotation-x={-Math.PI / 2}>
+        <circleGeometry args={[2.86, quality ? 120 : 84]} />
+        <meshBasicMaterial map={sceneHalo} transparent opacity={0.22} depthWrite={false} depthTest={false} />
       </mesh>
 
       <group position={[0, BASE_RING_Y, 0]} rotation-x={Math.PI / 2}>

@@ -45,6 +45,7 @@ html {
   scroll-behavior: smooth;
   background-color: var(--color-bg);
   overflow-x: hidden;
+  overflow-y: auto;
 }
 
 body {
@@ -53,8 +54,10 @@ body {
   color: var(--color-text);
   font-family: var(--font-sans);
   letter-spacing: -0.01em;
-  overscroll-behavior: none;
+  overscroll-behavior-x: none;
+  overscroll-behavior-y: auto;
   overflow-x: hidden;
+  overflow-y: auto;
 }
 
 a {

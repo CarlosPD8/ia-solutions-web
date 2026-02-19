@@ -88,7 +88,7 @@ export const HeroApple = ({ title, subtitle, primaryCta, secondaryCta }: HeroApp
 
           <div className="scene-hero-orbit hero-orbit-panel surface-card relative overflow-hidden p-3 sm:p-6 md:p-7">
             <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(560px_300px_at_58%_44%,rgba(73,128,255,0.2),transparent_68%)]" />
-            <div className="pointer-events-none absolute inset-x-8 bottom-2 h-24 rounded-full bg-[radial-gradient(200px_62px_at_50%_52%,rgba(194,216,255,0.2),rgba(8,10,16,0)_72%)]" />
+            <div className="pointer-events-none absolute inset-x-8 bottom-2 h-24 rounded-full bg-[radial-gradient(220px_66px_at_50%_52%,rgba(86,188,255,0.34),rgba(17,71,170,0.16)_42%,rgba(8,10,16,0)_76%)]" />
             <div className="relative">
               {shouldLoadOrbit ? (
                 <IconOrbit compact={isCompactOrbit || prefersReducedMotion} />

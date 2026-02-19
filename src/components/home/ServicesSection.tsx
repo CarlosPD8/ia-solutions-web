@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useMemo, useRef, useState, type TouchEventHandler } from "react";
+import { useMemo, useRef, useState, type MouseEvent, type TouchEventHandler } from "react";
 import { Service } from "@/core/domain/service";
 
 type Props = {
@@ -132,6 +132,24 @@ export const ServicesSection = ({ services }: Props) => {
     touchCurrentX.current = null;
   };
 
+  const onDesktopCardClick =
+    (relative: number) => (event: MouseEvent<HTMLElement>) => {
+      if (relative < 0) {
+        movePrev();
+        return;
+      }
+
+      if (relative > 0) {
+        moveNext();
+        return;
+      }
+
+      const rect = event.currentTarget.getBoundingClientRect();
+      const isLeftHalf = event.clientX - rect.left < rect.width / 2;
+      if (isLeftHalf) movePrev();
+      else moveNext();
+    };
+
   return (
     <section id="servicios" data-scene="services" className="scene-panel border-b border-default bg-transparent">
       <div className="section-shell py-16 md:py-20">
@@ -148,6 +166,7 @@ export const ServicesSection = ({ services }: Props) => {
         <div className="md:hidden">
           <div
             className="relative mx-auto h-[31.5rem] w-full overflow-visible [perspective:1200px]"
+            style={{ touchAction: "pan-y" }}
             onTouchStart={onMobileTouchStart}
             onTouchMove={onMobileTouchMove}
             onTouchEnd={onMobileTouchEnd}
@@ -203,32 +222,9 @@ export const ServicesSection = ({ services }: Props) => {
                   <article
                     key={service.id}
                     style={style}
+                    onClick={onDesktopCardClick(relative)}
                     className="js-service-card scene-service-card surface-card absolute left-[50vw] top-0 flex h-[32rem] w-[clamp(26rem,44vw,32rem)] flex-col p-7 will-change-transform transition-[transform,opacity] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
                   >
-                    {!isCenter ? (
-                      <button
-                        type="button"
-                        onClick={isLeft ? movePrev : moveNext}
-                        aria-label="Cambiar tarjeta de servicio"
-                        className="absolute inset-0 z-20 rounded-[inherit] cursor-pointer"
-                      />
-                    ) : (
-                      <>
-                        <button
-                          type="button"
-                          onClick={movePrev}
-                          aria-label="Ir al servicio anterior"
-                          className="absolute bottom-0 left-0 top-0 z-20 w-1/2 rounded-l-[inherit] cursor-w-resize"
-                        />
-                        <button
-                          type="button"
-                          onClick={moveNext}
-                          aria-label="Ir al servicio siguiente"
-                          className="absolute bottom-0 right-0 top-0 z-20 w-1/2 rounded-r-[inherit] cursor-e-resize"
-                        />
-                      </>
-                    )}
-
                     <div className="relative z-10 pointer-events-none">
                       <div className="mb-5 inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/15 bg-white/[0.05]">
                         <span className="h-2.5 w-2.5 rounded-full bg-secondary" />
