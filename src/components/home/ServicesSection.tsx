@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState, type TouchEventHandler } from "react";
 import { Service } from "@/core/domain/service";
 
 type Props = {
@@ -10,6 +10,9 @@ type Props = {
 export const ServicesSection = ({ services }: Props) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const total = services.length;
+  const touchStartX = useRef<number | null>(null);
+  const touchCurrentX = useRef<number | null>(null);
+  const SWIPE_THRESHOLD = 42;
 
   const movePrev = () => setActiveIndex((prev) => (prev - 1 + total) % total);
   const moveNext = () => setActiveIndex((prev) => (prev + 1) % total);
@@ -103,6 +106,32 @@ export const ServicesSection = ({ services }: Props) => {
     };
   };
 
+  const onMobileTouchStart: TouchEventHandler<HTMLDivElement> = (event) => {
+    const x = event.touches[0]?.clientX;
+    if (typeof x !== "number") return;
+    touchStartX.current = x;
+    touchCurrentX.current = x;
+  };
+
+  const onMobileTouchMove: TouchEventHandler<HTMLDivElement> = (event) => {
+    const x = event.touches[0]?.clientX;
+    if (typeof x !== "number") return;
+    touchCurrentX.current = x;
+  };
+
+  const onMobileTouchEnd = () => {
+    if (touchStartX.current === null || touchCurrentX.current === null) return;
+    const deltaX = touchCurrentX.current - touchStartX.current;
+
+    if (Math.abs(deltaX) >= SWIPE_THRESHOLD) {
+      if (deltaX < 0) moveNext();
+      if (deltaX > 0) movePrev();
+    }
+
+    touchStartX.current = null;
+    touchCurrentX.current = null;
+  };
+
   return (
     <section id="servicios" data-scene="services" className="scene-panel border-b border-default bg-transparent">
       <div className="section-shell py-16 md:py-20">
@@ -117,12 +146,16 @@ export const ServicesSection = ({ services }: Props) => {
         </div>
 
         <div className="md:hidden">
-          <div className="relative mx-auto h-[31.5rem] w-full overflow-visible [perspective:1200px]">
+          <div
+            className="relative mx-auto h-[31.5rem] w-full overflow-visible [perspective:1200px]"
+            onTouchStart={onMobileTouchStart}
+            onTouchMove={onMobileTouchMove}
+            onTouchEnd={onMobileTouchEnd}
+            onTouchCancel={onMobileTouchEnd}
+          >
             {services.map((service, index) => {
               const relative = getRelative(index);
               const visible = visibleIndexes.has(index);
-              const isCenter = relative === 0;
-              const isLeft = relative < 0;
               const style = visible ? getMobileCardStyle(relative) : getMobileCardStyle(99);
 
               return (
@@ -131,31 +164,7 @@ export const ServicesSection = ({ services }: Props) => {
                   style={style}
                   className="surface-card absolute left-1/2 top-0 flex h-[31rem] w-[min(88vw,23.5rem)] flex-col p-6 will-change-transform transition-[transform,opacity] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
                 >
-                  {!isCenter ? (
-                    <button
-                      type="button"
-                      onClick={isLeft ? movePrev : moveNext}
-                      aria-label="Cambiar tarjeta de servicio"
-                      className="absolute inset-0 z-20 rounded-[inherit] cursor-pointer"
-                    />
-                  ) : (
-                    <>
-                      <button
-                        type="button"
-                        onClick={movePrev}
-                        aria-label="Ir al servicio anterior"
-                        className="absolute bottom-0 left-0 top-0 z-20 w-1/2 rounded-l-[inherit]"
-                      />
-                      <button
-                        type="button"
-                        onClick={moveNext}
-                        aria-label="Ir al servicio siguiente"
-                        className="absolute bottom-0 right-0 top-0 z-20 w-1/2 rounded-r-[inherit]"
-                      />
-                    </>
-                  )}
-
-                  <div className="relative z-10 pointer-events-none">
+                  <div className="relative z-10">
                     <div className="mb-5 inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/15 bg-white/[0.05]">
                       <span className="h-2.5 w-2.5 rounded-full bg-secondary" />
                     </div>
