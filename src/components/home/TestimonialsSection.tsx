@@ -1,54 +1,124 @@
-// src/components/home/TestimonialsSection.tsx
 "use client";
 
-import { motion } from "framer-motion";
+import { useEffect, useRef } from "react";
 import { Testimonial } from "@/core/domain/testimonial";
-import { enterBlurUp, stagger } from "@/components/motion/presets";
+import { getGsap } from "@/lib/gsap";
+import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
 type Props = {
   testimonials: Testimonial[];
 };
 
 export const TestimonialsSection = ({ testimonials }: Props) => {
+  const rootRef = useRef<HTMLElement | null>(null);
+  const reduceMotion = useReducedMotionSafe();
+  const companies = Array.from(new Set(testimonials.map((item) => item.company)));
+
+  useEffect(() => {
+    if (reduceMotion) return;
+
+    let cleanup: (() => void) | undefined;
+
+    (async () => {
+      const modules = await getGsap();
+      if (!modules || !rootRef.current) return;
+
+      const { gsap } = modules;
+      const ctx = gsap.context(() => {
+        gsap.fromTo(
+          ".js-testimonial-head",
+          { opacity: 0, y: 20 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.72,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: rootRef.current,
+              start: "top 78%",
+              once: true,
+            },
+          },
+        );
+
+        gsap.fromTo(
+          ".js-testimonial-card",
+          { opacity: 0, y: 24 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.7,
+            stagger: 0.12,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: rootRef.current,
+              start: "top 68%",
+              once: true,
+            },
+          },
+        );
+
+        gsap.fromTo(
+          ".js-company-pill",
+          { opacity: 0, y: 12 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.5,
+            stagger: 0.06,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: rootRef.current,
+              start: "top 62%",
+              once: true,
+            },
+          },
+        );
+      }, rootRef);
+
+      cleanup = () => ctx.revert();
+    })();
+
+    return () => cleanup?.();
+  }, [reduceMotion]);
+
   return (
-    <section id="testimonios" className="border-b border-default bg-transparent">
-      <motion.div
-        className="mx-auto max-w-6xl px-4 py-14"
-        variants={stagger(0.08, 0.06)}
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, amount: 0.25 }}
-      >
-        <motion.div className="mb-8 space-y-3" variants={enterBlurUp}>
-          <h2 className="text-2xl font-semibold tracking-tight text-primary">
+    <section id="testimonios" ref={rootRef} className="border-b border-default bg-transparent">
+      <div className="section-shell py-16 md:py-20">
+        <div className="js-testimonial-head mb-10 space-y-4">
+          <h2 className="text-3xl font-semibold tracking-tight text-primary md:text-4xl">
             Lo que dicen nuestros clientes
           </h2>
-          <p className="max-w-2xl text-sm text-muted">
-            Resultados medibles aplicando IA de forma estratégica, no solo como
-            una moda tecnológica.
+          <p className="max-w-3xl text-sm leading-7 text-muted md:text-base">
+            Resultados medibles aplicando IA de forma estratégica, no solo como una moda tecnológica.
           </p>
-        </motion.div>
+        </div>
 
-        <div className="grid gap-6 md:grid-cols-2">
-          {testimonials.map((t) => (
-            <motion.article
-              key={t.id}
-              className="card group relative flex flex-col rounded-3xl p-6"
-              variants={enterBlurUp}
-            >
-              <p className="text-sm italic text-primary">“{t.quote}”</p>
-              <div className="mt-4 text-xs text-muted">
-                <p className="font-semibold text-primary">{t.name}</p>
+        <div className="grid gap-5 md:grid-cols-2">
+          {testimonials.map((testimonial) => (
+            <article key={testimonial.id} className="js-testimonial-card surface-card p-6 md:p-7">
+              <p className="text-2xl leading-9 tracking-tight text-primary">“{testimonial.quote}”</p>
+              <div className="mt-6 text-sm text-muted">
+                <p className="text-base font-semibold text-primary">{testimonial.name}</p>
                 <p>
-                  {t.role}, {t.company}
+                  {testimonial.role}, {testimonial.company}
                 </p>
               </div>
-
-              <div className="pointer-events-none absolute inset-x-4 bottom-0 h-9 translate-y-1 rounded-full bg-linear-to-t from-[color:var(--color-secondary-500)]/35 to-transparent opacity-0 blur-3xl transition-opacity group-hover:opacity-100" />
-            </motion.article>
+            </article>
           ))}
         </div>
-      </motion.div>
+
+        <div className="mt-8 flex flex-wrap gap-x-8 gap-y-3 text-sm text-muted">
+          {companies.map((company) => (
+            <span
+              key={company}
+              className="js-company-pill inline-flex items-center rounded-full border border-white/10 bg-white/[0.02] px-3 py-1.5"
+            >
+              {company}
+            </span>
+          ))}
+        </div>
+      </div>
     </section>
   );
 };
