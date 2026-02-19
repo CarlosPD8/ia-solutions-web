@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type TouchEventHandler } from "react";
 import { Testimonial } from "@/core/domain/testimonial";
 import { getGsap } from "@/lib/gsap";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
@@ -14,6 +14,9 @@ export const TestimonialsSection = ({ testimonials }: Props) => {
   const reduceMotion = useReducedMotionSafe();
   const [activeIndex, setActiveIndex] = useState(0);
   const total = testimonials.length;
+  const touchStartX = useRef<number | null>(null);
+  const touchCurrentX = useRef<number | null>(null);
+  const SWIPE_THRESHOLD = 42;
   const companies = useMemo(() => Array.from(new Set(testimonials.map((item) => item.company))), [testimonials]);
 
   const goTo = (index: number) => {
@@ -23,6 +26,32 @@ export const TestimonialsSection = ({ testimonials }: Props) => {
 
   const movePrev = () => goTo(activeIndex - 1);
   const moveNext = () => goTo(activeIndex + 1);
+
+  const onTouchStart: TouchEventHandler<HTMLDivElement> = (event) => {
+    const x = event.touches[0]?.clientX;
+    if (typeof x !== "number") return;
+    touchStartX.current = x;
+    touchCurrentX.current = x;
+  };
+
+  const onTouchMove: TouchEventHandler<HTMLDivElement> = (event) => {
+    const x = event.touches[0]?.clientX;
+    if (typeof x !== "number") return;
+    touchCurrentX.current = x;
+  };
+
+  const onTouchEnd = () => {
+    if (touchStartX.current === null || touchCurrentX.current === null) return;
+    const deltaX = touchCurrentX.current - touchStartX.current;
+
+    if (Math.abs(deltaX) >= SWIPE_THRESHOLD) {
+      if (deltaX < 0) moveNext();
+      if (deltaX > 0) movePrev();
+    }
+
+    touchStartX.current = null;
+    touchCurrentX.current = null;
+  };
 
   useEffect(() => {
     if (reduceMotion) return;
@@ -133,7 +162,14 @@ export const TestimonialsSection = ({ testimonials }: Props) => {
           </div>
         </div>
 
-        <div className="relative overflow-hidden rounded-[1.5rem]">
+        <div
+          className="relative overflow-hidden rounded-[1.5rem]"
+          style={{ touchAction: "pan-y" }}
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
+          onTouchCancel={onTouchEnd}
+        >
           <div
             className="flex transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
             style={{ transform: `translate3d(-${activeIndex * 100}%, 0, 0)` }}
