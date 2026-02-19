@@ -92,7 +92,12 @@ export const HowItWorksSection = ({ steps }: Props) => {
   }, [reduceMotion, steps.length]);
 
   return (
-    <section id="como-funciona" ref={rootRef} className="border-b border-default bg-transparent">
+    <section
+      id="como-funciona"
+      data-scene="process"
+      ref={rootRef}
+      className="scene-panel border-b border-default bg-transparent"
+    >
       <div className="section-shell py-16 md:py-20">
         <div className="js-process-head mb-10 space-y-4">
           <h2 className="text-3xl font-semibold tracking-tight text-primary md:text-4xl">
@@ -117,7 +122,7 @@ export const HowItWorksSection = ({ steps }: Props) => {
                     if (!node) return;
                     stepRefs.current[index] = node;
                   }}
-                  className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 opacity-100 will-change-transform"
+                  className="scene-process-step rounded-2xl border border-white/10 bg-white/[0.03] p-4 opacity-100 will-change-transform"
                 >
                   <div className="flex items-start gap-4">
                     <span

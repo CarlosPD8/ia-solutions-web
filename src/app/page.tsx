@@ -1,8 +1,8 @@
 import { CtaSection } from "@/components/home/CtaSection";
-import { HeroSection } from "@/components/home/HeroSection";
 import { HowItWorksSection } from "@/components/home/HowItWorksSection";
 import { ServicesSection } from "@/components/home/ServicesSection";
 import { TestimonialsSection } from "@/components/home/TestimonialsSection";
+import { HeroApple } from "@/components/hero/HeroApple";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { getHomeContent } from "@/core/application/getHomeContent";
 
@@ -12,7 +12,7 @@ export default function HomePage() {
   return (
     <MainLayout>
       <div data-scene-root>
-        <HeroSection
+        <HeroApple
           title={content.hero.title}
           subtitle={content.hero.subtitle}
           primaryCta={content.hero.primaryCta}

@@ -83,9 +83,14 @@ export const TestimonialsSection = ({ testimonials }: Props) => {
   }, [reduceMotion]);
 
   return (
-    <section id="testimonios" ref={rootRef} className="border-b border-default bg-transparent">
+    <section
+      id="testimonios"
+      data-scene="testimonials"
+      ref={rootRef}
+      className="scene-panel border-b border-default bg-transparent"
+    >
       <div className="section-shell py-16 md:py-20">
-        <div className="js-testimonial-head mb-10 space-y-4">
+        <div className="js-testimonial-head scene-testimonials-head mb-10 space-y-4">
           <h2 className="text-3xl font-semibold tracking-tight text-primary md:text-4xl">
             Lo que dicen nuestros clientes
           </h2>
@@ -96,7 +101,11 @@ export const TestimonialsSection = ({ testimonials }: Props) => {
 
         <div className="grid gap-5 md:grid-cols-2">
           {testimonials.map((testimonial) => (
-            <article key={testimonial.id} className="js-testimonial-card surface-card p-6 md:p-7">
+            <article
+              key={testimonial.id}
+              data-testimonial-card
+              className="js-testimonial-card surface-card p-6 md:p-7"
+            >
               <p className="text-2xl leading-9 tracking-tight text-primary">“{testimonial.quote}”</p>
               <div className="mt-6 text-sm text-muted">
                 <p className="text-base font-semibold text-primary">{testimonial.name}</p>

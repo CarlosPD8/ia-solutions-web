@@ -112,14 +112,43 @@ a {
 }
 
 .surface-card {
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: var(--radius-xl);
-  background: rgba(255, 255, 255, 0.04);
-  box-shadow: var(--shadow-line), var(--shadow-soft);
+  background:
+    linear-gradient(150deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.015) 45%),
+    rgba(255, 255, 255, 0.03);
+  box-shadow:
+    var(--shadow-line),
+    0 24px 58px rgba(0, 0, 0, 0.34),
+    0 1px 0 rgba(255, 255, 255, 0.05) inset;
+  backdrop-filter: blur(14px);
 }
 
 .scene-panel {
   position: relative;
+  isolation: isolate;
+}
+
+.scene-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(420px 180px at 75% 20%, rgba(45, 100, 230, 0.09), transparent 72%);
+  opacity: 0.9;
+}
+
+.hero-orbit-panel {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background:
+    radial-gradient(560px 260px at 60% 56%, rgba(65, 112, 226, 0.14), transparent 68%),
+    linear-gradient(170deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.015) 48%),
+    rgba(9, 12, 20, 0.42);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 26px 60px rgba(0, 0, 0, 0.42),
+    0 0 0 1px rgba(145, 176, 238, 0.08);
+  backdrop-filter: blur(16px);
 }
 
 .scene-orbit-spin {
@@ -161,29 +190,26 @@ a {
   }
 }
 
-@media (min-width: 1024px) {
-  [data-scene-root] {
-    scroll-snap-type: y proximity;
-  }
-
-  .scene-panel {
-    scroll-snap-align: start;
-  }
-}
-
 .btn-apple-primary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border-radius: 999px;
-  background: var(--color-secondary-500);
+  border: 1px solid rgba(168, 198, 255, 0.26);
+  background: linear-gradient(180deg, #3f86ff, #1f6bff);
   color: #fff;
-  transition: transform 0.24s ease, background-color 0.24s ease;
+  box-shadow: 0 8px 24px rgba(31, 107, 255, 0.32);
+  transition: transform 0.28s ease, background 0.28s ease, box-shadow 0.28s ease;
 }
 
 .btn-apple-primary:hover {
-  background: var(--color-secondary-400);
-  transform: translateY(-1px);
+  background: linear-gradient(180deg, #5b9bff, #2b75ff);
+  transform: translateY(-1px) scale(1.01);
+  box-shadow: 0 12px 28px rgba(45, 118, 255, 0.36);
+}
+
+.btn-apple-primary:active {
+  transform: translateY(0) scale(0.995);
 }
 
 .btn-apple-ghost {
@@ -191,15 +217,24 @@ a {
   align-items: center;
   justify-content: center;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
   color: var(--color-text);
-  transition: border-color 0.24s ease, transform 0.24s ease;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  transition:
+    border-color 0.28s ease,
+    transform 0.28s ease,
+    background 0.28s ease;
 }
 
 .btn-apple-ghost:hover {
   border-color: rgba(59, 130, 255, 0.8);
-  transform: translateY(-1px);
+  background: linear-gradient(180deg, rgba(102, 157, 255, 0.2), rgba(255, 255, 255, 0.03));
+  transform: translateY(-1px) scale(1.01);
+}
+
+.btn-apple-ghost:active {
+  transform: translateY(0) scale(0.996);
 }
 
 .focus-ring {
@@ -234,7 +269,7 @@ a {
 
 @media (min-width: 768px) {
   .section-shell {
-    padding-inline: 1.5rem;
+    padding-inline: 1.75rem;
   }
 }
 

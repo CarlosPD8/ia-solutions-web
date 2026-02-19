@@ -8,8 +8,6 @@ export const ScrollScenes = () => {
   const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
-    if (prefersReducedMotion) return;
-
     let cleanup: (() => void) | undefined;
 
     (async () => {
@@ -19,224 +17,166 @@ export const ScrollScenes = () => {
       const { gsap, ScrollTrigger } = modules;
       const mm = gsap.matchMedia();
 
-      mm.add("(min-width: 1024px)", () => {
-        const hero = document.querySelector<HTMLElement>('[data-scene="hero"]');
-        const services = document.querySelector<HTMLElement>('[data-scene="services"]');
-        const process = document.querySelector<HTMLElement>('[data-scene="process"]');
-        const testimonials = document.querySelector<HTMLElement>('[data-scene="testimonials"]');
+      mm.add(
+        {
+          desktop: "(min-width: 1024px)",
+          reduced: "(prefers-reduced-motion: reduce)",
+        },
+        (ctx) => {
+          const conditions = ctx.conditions as { desktop?: boolean; reduced?: boolean };
+          const useReduced = Boolean(conditions.reduced || prefersReducedMotion);
 
-        if (!hero || !services || !process || !testimonials) return;
+          const hero = document.querySelector<HTMLElement>('[data-scene="hero"]');
+          const services = document.querySelector<HTMLElement>('[data-scene="services"]');
+          const process = document.querySelector<HTMLElement>('[data-scene="process"]');
+          const testimonials = document.querySelector<HTMLElement>('[data-scene="testimonials"]');
+          const root = document.querySelector<HTMLElement>("[data-scene-root]");
+          if (!hero || !services || !process || !testimonials) return;
 
-        const heroTl = gsap.timeline({
-          scrollTrigger: {
-            trigger: hero,
-            start: "top top",
-            end: "+=140%",
-            scrub: true,
-            pin: true,
-            anticipatePin: 1,
-          },
-        });
+          const sectionPanels = [hero, services, process, testimonials];
+          const serviceCards = gsap.utils.toArray<HTMLElement>(".scene-service-card");
+          const processSteps = gsap.utils.toArray<HTMLElement>(".scene-process-step");
+          const processDots = gsap.utils.toArray<HTMLElement>("[data-step-dot]");
+          const testimonialCards = gsap.utils.toArray<HTMLElement>("[data-testimonial-card]");
 
-        heroTl
-          .to(".scene-hero-copy", { yPercent: -14, opacity: 0.48, ease: "none" }, 0)
-          .to(".scene-hero-orbit", { yPercent: 6, opacity: 0.9, ease: "none" }, 0);
+          if (conditions.desktop && !useReduced) {
+            const createPinnedScene = (panel: HTMLElement, duration = 160) =>
+              ScrollTrigger.create({
+                trigger: panel,
+                start: "top top",
+                end: `+=${duration}%`,
+                pin: true,
+                scrub: 0.6,
+                anticipatePin: 1,
+                fastScrollEnd: true,
+              });
 
-        const serviceCards = gsap.utils.toArray<HTMLElement>(".scene-service-card");
-        gsap.set(serviceCards, { transformPerspective: 1200, transformOrigin: "center center" });
+            createPinnedScene(hero, 135);
+            createPinnedScene(services, 175);
+            createPinnedScene(process, 170);
+            createPinnedScene(testimonials, 130);
 
-        const servicesTl = gsap.timeline({
-          scrollTrigger: {
-            trigger: services,
-            start: "top top",
-            end: "+=180%",
-            scrub: true,
-            pin: true,
-            anticipatePin: 1,
-          },
-        });
+            gsap.timeline({ scrollTrigger: { trigger: hero, start: "top top", end: "+=135%", scrub: 0.7 } }).to(
+              ".scene-hero-copy",
+              { yPercent: -12, opacity: 0.55, scale: 0.985, ease: "none" },
+              0,
+            ).to(
+              ".scene-hero-orbit",
+              { yPercent: 5, scale: 1.03, opacity: 0.95, ease: "none" },
+              0,
+            );
 
-        servicesTl.fromTo(".scene-services-head", { opacity: 0.65 }, { opacity: 1, ease: "none" }, 0);
-        servicesTl.to(serviceCards, { opacity: 0.42, scale: 0.92, rotateX: 6, y: 18, ease: "none" }, 0);
-        serviceCards.forEach((_, index) => {
-          const start = 0.2 + index * 0.28;
-          servicesTl.to(
-            serviceCards[index],
-            {
-              opacity: 1,
-              scale: 1.04,
-              rotateX: 0,
-              y: 0,
-              ease: "none",
-              duration: 0.22,
-            },
-            start,
-          );
-          servicesTl.to(
-            serviceCards[index],
-            {
-              opacity: 0.58,
-              scale: 0.95,
-              rotateX: 4,
-              y: 10,
-              ease: "none",
-              duration: 0.18,
-            },
-            start + 0.22,
-          );
-        });
-        servicesTl.to(serviceCards[serviceCards.length - 1], { opacity: 1, scale: 1.02, rotateX: 0, y: 0, ease: "none" }, 0.9);
+            gsap.set(serviceCards, { transformPerspective: 1200, transformOrigin: "center center", opacity: 0.62 });
+            const servicesTl = gsap.timeline({
+              scrollTrigger: { trigger: services, start: "top top", end: "+=175%", scrub: 0.7 },
+            });
+            servicesTl
+              .fromTo(".scene-services-head", { opacity: 0.62, yPercent: 4 }, { opacity: 1, yPercent: 0, ease: "none" }, 0)
+              .to(serviceCards, { opacity: 0.48, scale: 0.95, y: 14, rotateX: 4, ease: "none" }, 0);
 
-        const processSteps = gsap.utils.toArray<HTMLElement>(".scene-process-step");
-        const processDots = gsap.utils.toArray<HTMLElement>("[data-step-dot]");
-        gsap.set(processSteps, { opacity: 0.45, scale: 0.98 });
-        gsap.set(processDots, { opacity: 0.45, scale: 0.78 });
+            serviceCards.forEach((card, index) => {
+              servicesTl.to(
+                card,
+                { opacity: 1, scale: 1.02, y: 0, rotateX: 0, ease: "none", duration: 0.16 },
+                0.22 + index * 0.24,
+              );
+            });
 
-        const processTl = gsap.timeline({
-          scrollTrigger: {
-            trigger: process,
-            start: "top top",
-            end: "+=190%",
-            scrub: true,
-            pin: true,
-            anticipatePin: 1,
-          },
-        });
+            gsap.set(processSteps, { opacity: 0.5, scale: 0.985 });
+            gsap.set(processDots, { opacity: 0.42, scale: 0.72 });
+            const processTl = gsap.timeline({
+              scrollTrigger: { trigger: process, start: "top top", end: "+=170%", scrub: 0.68 },
+            });
+            processSteps.forEach((step, index) => {
+              const marker = index * 0.24;
+              processTl
+                .to(processSteps, { opacity: 0.45, scale: 0.98, duration: 0.001, ease: "none" }, marker)
+                .to(
+                  processDots,
+                  {
+                    opacity: 0.4,
+                    scale: 0.68,
+                    backgroundColor: "rgba(255,255,255,0.12)",
+                    duration: 0.001,
+                    ease: "none",
+                  },
+                  marker,
+                )
+                .to(step, { opacity: 1, scale: 1.018, duration: 0.12, ease: "none" }, marker + 0.04)
+                .to(
+                  processDots[index],
+                  { opacity: 1, scale: 1, backgroundColor: "#2b6fff", duration: 0.12, ease: "none" },
+                  marker + 0.04,
+                );
+            });
 
-        processSteps.forEach((step, index) => {
-          const marker = index * 0.22;
-          processTl.to(
-            processSteps,
-            { opacity: 0.42, scale: 0.97, duration: 0.001, ease: "none" },
-            marker,
-          );
-          processTl.to(
-            processDots,
-            { opacity: 0.38, scale: 0.7, backgroundColor: "rgba(255,255,255,0.08)", duration: 0.001, ease: "none" },
-            marker,
-          );
-          processTl.to(step, { opacity: 1, scale: 1.02, ease: "none", duration: 0.12 }, marker + 0.03);
-          processTl.to(
-            processDots[index],
-            { opacity: 1, scale: 1, backgroundColor: "#2b6fff", ease: "none", duration: 0.12 },
-            marker + 0.03,
-          );
-        });
+            gsap.timeline({
+              scrollTrigger: { trigger: testimonials, start: "top top", end: "+=130%", scrub: 0.65 },
+            })
+              .fromTo(
+                ".scene-testimonials-head",
+                { opacity: 0.55, yPercent: 5 },
+                { opacity: 1, yPercent: 0, ease: "none" },
+                0,
+              )
+              .fromTo(
+                testimonialCards,
+                { opacity: 0.48, y: 26, scale: 0.965 },
+                { opacity: 1, y: 0, scale: 1, stagger: 0.14, ease: "none" },
+                0.1,
+              );
 
-        const metricPanel = document.querySelector<HTMLElement>("[data-metric-panel]");
-        if (metricPanel) {
-          const bars = gsap.utils.toArray<HTMLElement>("[data-metric-bar]");
-          const shimmers = gsap.utils.toArray<HTMLElement>("[data-metric-shimmer]");
-          const line = document.querySelector<SVGPathElement>("[data-metric-line] path");
+            gsap.to(testimonialCards, {
+              y: -5,
+              repeat: -1,
+              yoyo: true,
+              duration: 3.1,
+              stagger: 0.25,
+              ease: "sine.inOut",
+            });
 
-          gsap.set(bars, { scaleX: 0, transformOrigin: "left center" });
-          gsap.set(shimmers, { opacity: 0 });
-          if (line) {
-            const length = line.getTotalLength();
-            gsap.set(line, { strokeDasharray: length, strokeDashoffset: length });
+            if (root) {
+              ScrollTrigger.create({
+                trigger: root,
+                start: "top top",
+                end: "bottom bottom",
+                snap: {
+                  snapTo: (progress) => {
+                    const points = [0, 0.25, 0.5, 0.75];
+                    return points.reduce((prev, curr) =>
+                      Math.abs(curr - progress) < Math.abs(prev - progress) ? curr : prev,
+                    );
+                  },
+                  duration: { min: 0.15, max: 0.35 },
+                  ease: "power1.out",
+                  delay: 0.05,
+                },
+              });
+            }
+
+            return;
           }
 
-          const metricTl = gsap.timeline({
-            scrollTrigger: {
-              trigger: metricPanel,
-              start: "top 70%",
-              once: true,
-            },
-          });
-
-          bars.forEach((bar, index) => {
-            const target = Number(bar.dataset.target ?? "0.8");
-            metricTl.to(bar, { scaleX: target, duration: 0.62, ease: "power2.out" }, index * 0.12);
-            metricTl.to(
-              shimmers[index],
-              { xPercent: 240, opacity: 0.7, duration: 0.48, ease: "power2.out" },
-              index * 0.12,
+          sectionPanels.forEach((panel, index) => {
+            gsap.fromTo(
+              panel.querySelectorAll("h1, h2, p, .scene-service-card, .scene-process-step, [data-testimonial-card], .scene-hero-orbit, .scene-hero-copy"),
+              { opacity: 0, y: 18 },
+              {
+                opacity: 1,
+                y: 0,
+                duration: 0.62,
+                ease: "power2.out",
+                stagger: 0.04,
+                scrollTrigger: {
+                  trigger: panel,
+                  start: index === 0 ? "top 88%" : "top 82%",
+                  once: true,
+                },
+              },
             );
           });
-
-          if (line) {
-            metricTl.to(line, { strokeDashoffset: 0, duration: 0.9, ease: "power2.out" }, 0.12);
-          }
-        }
-
-        const testimonialCards = gsap.utils.toArray<HTMLElement>("[data-testimonial-card]");
-        const testimonialsTl = gsap.timeline({
-          scrollTrigger: {
-            trigger: testimonials,
-            start: "top top",
-            end: "+=120%",
-            scrub: true,
-            pin: true,
-            anticipatePin: 1,
-          },
-        });
-
-        testimonialsTl
-          .fromTo(".scene-testimonials-head", { opacity: 0.5, yPercent: 4 }, { opacity: 1, yPercent: 0, ease: "none" }, 0)
-          .fromTo(
-            testimonialCards,
-            { opacity: 0.48, y: 40, scale: 0.96 },
-            { opacity: 1, y: 0, scale: 1, stagger: 0.16, ease: "none" },
-            0.08,
-          );
-
-        gsap.to(testimonialCards, {
-          y: -7,
-          repeat: -1,
-          yoyo: true,
-          duration: 2.8,
-          stagger: 0.3,
-          ease: "sine.inOut",
-        });
-
-        ScrollTrigger.create({
-          trigger: hero.parentElement,
-          start: "top top",
-          end: "bottom bottom",
-          snap: {
-            snapTo: [0, 0.25, 0.5, 0.75],
-            duration: { min: 0.12, max: 0.32 },
-            delay: 0.04,
-            ease: "power1.out",
-          },
-        });
-      });
-
-      mm.add("(max-width: 1023px)", () => {
-        gsap.fromTo(
-          '[data-scene="hero"] .scene-hero-copy, [data-scene="hero"] .scene-hero-orbit',
-          { opacity: 0, y: 22 },
-          {
-            opacity: 1,
-            y: 0,
-            stagger: 0.12,
-            duration: 0.64,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: '[data-scene="hero"]',
-              start: "top 78%",
-              once: true,
-            },
-          },
-        );
-
-        gsap.fromTo(
-          ".scene-service-card, .scene-process-step, [data-testimonial-card]",
-          { opacity: 0, y: 24 },
-          {
-            opacity: 1,
-            y: 0,
-            stagger: 0.1,
-            duration: 0.62,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: '[data-scene="services"]',
-              start: "top 82%",
-              once: true,
-            },
-          },
-        );
-      });
+        },
+      );
 
       cleanup = () => {
         mm.revert();

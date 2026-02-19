@@ -65,9 +65,14 @@ export const ServicesSection = ({ services }: Props) => {
   }, [reduceMotion]);
 
   return (
-    <section id="servicios" ref={rootRef} className="border-b border-default bg-transparent">
+    <section
+      id="servicios"
+      data-scene="services"
+      ref={rootRef}
+      className="scene-panel border-b border-default bg-transparent"
+    >
       <div className="section-shell py-16 md:py-20">
-        <div className="js-services-head mb-10 space-y-4">
+        <div className="js-services-head scene-services-head mb-10 space-y-4">
           <h2 className="text-3xl font-semibold tracking-tight text-primary md:text-4xl">
             Servicios de IA para tu empresa
           </h2>
@@ -81,7 +86,7 @@ export const ServicesSection = ({ services }: Props) => {
           {services.map((service, index) => (
             <article
               key={service.id}
-              className="js-service-card surface-card flex h-full flex-col p-6 will-change-transform"
+              className="js-service-card scene-service-card surface-card flex h-full flex-col p-6 will-change-transform"
             >
               <div className="mb-5 inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/15 bg-white/[0.05]">
                 <span className="h-2.5 w-2.5 rounded-full bg-secondary" />
