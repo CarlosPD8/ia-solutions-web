@@ -184,16 +184,18 @@ export const ServicesSection = ({ services }: Props) => {
                   className="surface-card absolute left-1/2 top-0 flex h-[31rem] w-[min(88vw,23.5rem)] flex-col p-6 will-change-transform transition-[transform,opacity] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
                 >
                   <div className="relative z-10">
-                    <div className="mb-5 inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/15 bg-white/[0.05]">
-                      <span className="h-2.5 w-2.5 rounded-full bg-secondary" />
+                    <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-white/20 bg-[radial-gradient(circle_at_35%_30%,rgba(126,172,255,0.22),rgba(21,39,78,0.22)_70%)] shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_8px_20px_rgba(12,26,58,0.28)]">
+                      <ServiceCardIcon id={service.id} />
                     </div>
 
                     <div className="mb-3 text-xs font-medium tracking-[0.2em] text-secondary">
                       {String(index + 1).padStart(2, "0")}
                     </div>
-                    <h3 className="text-xl font-semibold tracking-tight text-primary">{service.title}</h3>
-                    <p className="mt-3 text-sm leading-7 text-muted">{service.shortDescription}</p>
-                    <ul className="mt-5 space-y-3 text-sm text-muted">
+                    <h3 className="text-[1.95rem] font-semibold tracking-tight text-primary leading-tight">
+                      {service.title}
+                    </h3>
+                    <p className="mt-3 text-base leading-8 text-muted">{service.shortDescription}</p>
+                    <ul className="mt-5 space-y-3 text-base text-muted">
                       {service.benefits.map((benefit) => (
                         <li key={benefit} className="flex items-start gap-2.5">
                           <span className="mt-2 h-1.5 w-1.5 rounded-full bg-secondary" />
@@ -226,18 +228,20 @@ export const ServicesSection = ({ services }: Props) => {
                     className="js-service-card scene-service-card surface-card absolute left-[50vw] top-0 flex h-[32rem] w-[clamp(26rem,44vw,32rem)] flex-col p-7 will-change-transform transition-[transform,opacity] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
                   >
                     <div className="relative z-10 pointer-events-none">
-                      <div className="mb-5 inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/15 bg-white/[0.05]">
-                        <span className="h-2.5 w-2.5 rounded-full bg-secondary" />
+                      <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-white/20 bg-[radial-gradient(circle_at_35%_30%,rgba(126,172,255,0.22),rgba(21,39,78,0.22)_70%)] shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_8px_20px_rgba(12,26,58,0.28)]">
+                        <ServiceCardIcon id={service.id} />
                       </div>
 
                       <div className="mb-3 text-xs font-medium tracking-[0.2em] text-secondary">
                         {String(index + 1).padStart(2, "0")}
                       </div>
 
-                      <h3 className="text-2xl font-semibold tracking-tight text-primary">{service.title}</h3>
-                      <p className="mt-3 text-sm leading-7 text-muted">{service.shortDescription}</p>
+                      <h3 className="text-[2.35rem] leading-[1.1] font-semibold tracking-tight text-primary">
+                        {service.title}
+                      </h3>
+                      <p className="mt-3 text-[1.2rem] leading-9 text-muted">{service.shortDescription}</p>
 
-                      <ul className="mt-6 space-y-3 text-sm text-muted">
+                      <ul className="mt-6 space-y-3 text-lg text-muted">
                         {service.benefits.map((benefit) => (
                           <li key={benefit} className="flex items-start gap-2.5">
                             <span className="mt-2 h-1.5 w-1.5 rounded-full bg-secondary" />
@@ -254,5 +258,51 @@ export const ServicesSection = ({ services }: Props) => {
         </div>
       </div>
     </section>
+  );
+};
+
+const ServiceCardIcon = ({ id }: { id: string }) => {
+  if (id === "chatbots") {
+    return (
+      <svg viewBox="0 0 24 24" className="h-6 w-6 text-[#79b4ff]" fill="none" aria-hidden="true">
+        <path
+          d="M5.5 6.5h13a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-7.2l-3.7 2.5v-2.5H5.5a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2Z"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinejoin="round"
+        />
+        <circle cx="9" cy="11.5" r="1" fill="currentColor" />
+        <circle cx="12" cy="11.5" r="1" fill="currentColor" />
+        <circle cx="15" cy="11.5" r="1" fill="currentColor" />
+      </svg>
+    );
+  }
+
+  if (id === "automation") {
+    return (
+      <svg viewBox="0 0 24 24" className="h-6 w-6 text-[#79b4ff]" fill="none" aria-hidden="true">
+        <path d="M12 4.2V6.3" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+        <circle cx="12" cy="3.2" r="0.9" fill="currentColor" />
+        <path
+          d="M7.3 7.2h9.4c1.4 0 2.5 1.1 2.5 2.5v5.1c0 1.4-1.1 2.5-2.5 2.5h-2.2l.7 2.1h-1.8l-1-2.1h-.8l-1 2.1H8.8l.7-2.1H7.3c-1.4 0-2.5-1.1-2.5-2.5V9.7c0-1.4 1.1-2.5 2.5-2.5Z"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinejoin="round"
+        />
+        <circle cx="9.3" cy="12.2" r="1" fill="currentColor" />
+        <circle cx="14.7" cy="12.2" r="1" fill="currentColor" />
+        <path d="M9.1 15h5.8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg viewBox="0 0 24 24" className="h-6 w-6 text-[#79b4ff]" fill="none" aria-hidden="true">
+      <path d="M4 18h16" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+      <path d="M6.5 16V11" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M11.8 16V7.8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M17.2 16V5.8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M6.5 11 11.8 7.8 17.2 5.8" stroke="currentColor" strokeWidth="1.3" opacity="0.85" />
+    </svg>
   );
 };
