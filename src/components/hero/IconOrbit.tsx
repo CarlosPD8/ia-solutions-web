@@ -1,12 +1,12 @@
 "use client";
 
 import { RoundedBox } from "@react-three/drei";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { useEffect, useMemo, useRef, type MutableRefObject, type PointerEventHandler } from "react";
+import { Canvas, useFrame, useLoader } from "@react-three/fiber";
+import { Suspense, useEffect, useMemo, useRef, type MutableRefObject, type PointerEventHandler } from "react";
 import * as THREE from "three";
 import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 
-type IconKind = "chat" | "gear" | "chart" | "cloud" | "db" | "flow" | "bot" | "shield";
+type IconKind = "react" | "whatsapp" | "n8n" | "sql" | "nextjs" | "docker" | "vercel" | "github";
 
 type PlanetConfig = {
   icon: IconKind;
@@ -24,13 +24,15 @@ const TILE_DEPTH = 0.12;
 const TILE_FLOAT_AMPLITUDE = 0.03;
 const MOBILE_PLANET_COUNT = 5;
 const CORE_TEXT_Z = CORE_RADIUS * 0.7;
-const BASE_RING_RADIUS = 1.68;
-const BASE_RING_Y = -1.18;
-const SYSTEM_SCALE_DESKTOP = 0.82;
-const SYSTEM_SCALE_MOBILE = 0.74;
+const BASE_RING_RADIUS = 1.84;
+const BASE_RING_Y = -1.44;
+const SYSTEM_SCALE_DESKTOP = 0.98;
+const SYSTEM_SCALE_MOBILE = 0.9;
 const DRAG_SENSITIVITY = 0.0056;
-const MAX_DRAG_TILT_X = 0.34;
-const MAX_DRAG_TILT_Y = 0.9;
+const MAX_DRAG_TILT_X = 0.24;
+const MAX_DRAG_TILT_Y = 0.58;
+const IA_LABEL_Y = 0.1;
+const IA_LABEL_Z = 1.05;
 
 type OrbitConfig = {
   radiusX: number;
@@ -43,22 +45,33 @@ type OrbitConfig = {
 };
 
 const ORBITS: OrbitConfig[] = [
-  { radiusX: 2.08, radiusZ: 1.34, tiltX: 1.22, tiltZ: 0.36, speed: 0.32, thickness: 0.012, opacity: 0.26 },
-  { radiusX: 1.82, radiusZ: 1.14, tiltX: 1.04, tiltZ: -0.46, speed: -0.41, thickness: 0.011, opacity: 0.22 },
-  { radiusX: 1.56, radiusZ: 1.02, tiltX: 1.36, tiltZ: 0.91, speed: 0.5, thickness: 0.01, opacity: 0.2 },
-  { radiusX: 1.22, radiusZ: 0.86, tiltX: 1.12, tiltZ: -0.82, speed: -0.58, thickness: 0.01, opacity: 0.18 },
+  { radiusX: 2.2, radiusZ: 1.42, tiltX: 1.22, tiltZ: 0.36, speed: 0.32, thickness: 0.012, opacity: 0.26 },
+  { radiusX: 1.94, radiusZ: 1.2, tiltX: 1.04, tiltZ: -0.46, speed: -0.41, thickness: 0.011, opacity: 0.22 },
+  { radiusX: 1.66, radiusZ: 1.08, tiltX: 1.36, tiltZ: 0.91, speed: 0.5, thickness: 0.01, opacity: 0.2 },
+  { radiusX: 1.28, radiusZ: 0.9, tiltX: 1.12, tiltZ: -0.82, speed: -0.58, thickness: 0.01, opacity: 0.18 },
 ];
 
 const PLANETS: PlanetConfig[] = [
-  { icon: "chat", orbit: 0, angleOffset: 0.2, speedFactor: 0.95, size: 0.52 },
-  { icon: "gear", orbit: 1, angleOffset: 1.65, speedFactor: 0.92, size: 0.5 },
-  { icon: "chart", orbit: 0, angleOffset: 3.72, speedFactor: 1.01, size: 0.52 },
-  { icon: "cloud", orbit: 2, angleOffset: 0.86, speedFactor: 1.06, size: 0.48 },
-  { icon: "db", orbit: 1, angleOffset: 3.02, speedFactor: 0.98, size: 0.48 },
-  { icon: "flow", orbit: 3, angleOffset: 5.18, speedFactor: 1.08, size: 0.46 },
-  { icon: "bot", orbit: 2, angleOffset: 2.26, speedFactor: 1.1, size: 0.44 },
-  { icon: "shield", orbit: 3, angleOffset: 4.5, speedFactor: 1.12, size: 0.44 },
+  { icon: "react", orbit: 0, angleOffset: 0.2, speedFactor: 0.95, size: 0.52 },
+  { icon: "whatsapp", orbit: 1, angleOffset: 1.65, speedFactor: 0.92, size: 0.5 },
+  { icon: "n8n", orbit: 0, angleOffset: 3.72, speedFactor: 1.01, size: 0.52 },
+  { icon: "sql", orbit: 2, angleOffset: 0.86, speedFactor: 1.06, size: 0.48 },
+  { icon: "nextjs", orbit: 1, angleOffset: 3.02, speedFactor: 0.98, size: 0.48 },
+  { icon: "docker", orbit: 3, angleOffset: 5.18, speedFactor: 1.08, size: 0.46 },
+  { icon: "vercel", orbit: 2, angleOffset: 2.26, speedFactor: 1.1, size: 0.44 },
+  { icon: "github", orbit: 3, angleOffset: 4.5, speedFactor: 1.12, size: 0.44 },
 ];
+
+const ICON_TEXTURE_URLS: Record<IconKind, string> = {
+  react: "/brand-icons/react.svg",
+  whatsapp: "/brand-icons/whatsapp.svg",
+  n8n: "/brand-icons/n8n.svg",
+  sql: "/brand-icons/sql.svg",
+  nextjs: "/brand-icons/nextjs.svg",
+  docker: "/brand-icons/docker.svg",
+  vercel: "/brand-icons/vercel.svg",
+  github: "/brand-icons/github.svg",
+};
 
 export const IconOrbit = ({ compact = false }: { compact?: boolean }) => {
   const reduceMotion = usePrefersReducedMotion();
@@ -123,7 +136,7 @@ export const IconOrbit = ({ compact = false }: { compact?: boolean }) => {
       <div className="pointer-events-none absolute inset-0 rounded-[2rem] bg-[radial-gradient(460px_260px_at_48%_46%,rgba(112,158,255,0.16),rgba(7,10,16,0)_70%)]" />
       <Canvas
         dpr={compact ? [1, 1.2] : [1, 1.7]}
-        camera={{ position: compact ? [0.58, 0.66, 8.35] : [0.66, 0.74, 7.9], fov: compact ? 37 : 34 }}
+        camera={{ position: compact ? [0.56, 0.67, 7.95] : [0.64, 0.76, 7.25], fov: compact ? 37 : 34 }}
         style={{ background: "transparent" }}
         gl={{ antialias: true, alpha: true, premultipliedAlpha: true, powerPreference: "high-performance" }}
         onCreated={({ gl }) => {
@@ -139,18 +152,33 @@ export const IconOrbit = ({ compact = false }: { compact?: boolean }) => {
         <directionalLight position={[-4, 1.8, -3]} intensity={0.45} color="#4f7be6" />
         <pointLight position={[0.1, 0.05, 1.85]} intensity={0.75} color="#85b3ff" />
         <pointLight position={[-2.8, -1, 3.8]} intensity={0.42} color="#376ff1" />
-        <SolarSystem
-          planets={planets}
-          compact={compact}
-          quality={quality}
-          reduceMotion={reduceMotion}
-          dragTilt={dragTilt}
-        />
+        <Suspense fallback={<SolarFallback compact={compact} />}>
+          <SolarSystem
+            planets={planets}
+            compact={compact}
+            quality={quality}
+            reduceMotion={reduceMotion}
+            dragTilt={dragTilt}
+          />
+        </Suspense>
       </Canvas>
       <div className="pointer-events-none absolute inset-x-7 bottom-5 h-16 rounded-full border border-white/15 bg-[radial-gradient(180px_55px_at_50%_46%,rgba(179,203,255,0.2),rgba(9,12,20,0.45)_72%)] blur-[0.4px]" />
     </div>
   );
 };
+
+const SolarFallback = ({ compact }: { compact: boolean }) => (
+  <group scale={compact ? SYSTEM_SCALE_MOBILE : SYSTEM_SCALE_DESKTOP}>
+    <mesh position={[0, BASE_RING_Y, 0]} rotation-x={Math.PI / 2}>
+      <torusGeometry args={[BASE_RING_RADIUS, 0.07, 20, 96]} />
+      <meshBasicMaterial color="#59bcff" transparent opacity={0.7} />
+    </mesh>
+    <mesh position={[0, 0.08, 0]}>
+      <sphereGeometry args={[CORE_RADIUS * 0.96, 38, 38]} />
+      <meshBasicMaterial color="#3abfff" transparent opacity={0.22} />
+    </mesh>
+  </group>
+);
 
 const SolarSystem = ({
   planets,
@@ -166,24 +194,37 @@ const SolarSystem = ({
   dragTilt: MutableRefObject<{ x: number; y: number }>;
 }) => {
   const rigRef = useRef<THREE.Group | null>(null);
+  const iaLabelRef = useRef<THREE.Mesh | null>(null);
   const spinRef = useRef(0);
   const planetRefs = useRef<THREE.Group[]>([]);
 
-  const iconTextures = useMemo(() => makeIconTextures(), []);
+  const iconTextureList = useLoader(
+    THREE.TextureLoader,
+    (Object.keys(ICON_TEXTURE_URLS) as IconKind[]).map((kind) => ICON_TEXTURE_URLS[kind]),
+  );
+  const iconTextures = useMemo(() => {
+    const map = {} as Record<IconKind, THREE.Texture>;
+    (Object.keys(ICON_TEXTURE_URLS) as IconKind[]).forEach((kind, index) => {
+      const texture = iconTextureList[index];
+      texture.colorSpace = THREE.SRGBColorSpace;
+      texture.needsUpdate = true;
+      map[kind] = texture;
+    });
+    return map;
+  }, [iconTextureList]);
   const iaTextTexture = useMemo(() => makeIATextTexture(), []);
-  const coreHighlight = useMemo(() => makeCoreHighlightTexture(), []);
+  const dotTexture = useMemo(() => makeDotTexture(), []);
   const sceneHalo = useMemo(() => makeSceneHaloTexture(), []);
   const spikeTexture = useMemo(() => makeSpikeTexture(), []);
 
   useEffect(
     () => () => {
-      Object.values(iconTextures).forEach((texture) => texture.dispose());
       iaTextTexture.dispose();
-      coreHighlight.dispose();
+      dotTexture.dispose();
       sceneHalo.dispose();
       spikeTexture.dispose();
     },
-    [coreHighlight, iaTextTexture, iconTextures, sceneHalo, spikeTexture],
+    [dotTexture, iaTextTexture, sceneHalo, spikeTexture],
   );
 
   useFrame(({ clock, camera }, delta) => {
@@ -208,6 +249,10 @@ const SolarSystem = ({
     camera.position.y = THREE.MathUtils.damp(camera.position.y, cameraY + dragTilt.current.x * 0.2, 2.2, delta);
     camera.lookAt(0, 0.06, 0);
 
+    if (iaLabelRef.current) {
+      iaLabelRef.current.quaternion.copy(camera.quaternion);
+    }
+
     planetRefs.current.forEach((planet, index) => {
       const cfg = planets[index];
       const orbit = ORBITS[cfg.orbit];
@@ -231,15 +276,22 @@ const SolarSystem = ({
   });
 
   return (
+    <>
     <group ref={rigRef} scale={compact ? SYSTEM_SCALE_MOBILE : SYSTEM_SCALE_DESKTOP}>
       <mesh position={[0, -0.28, -0.1]} rotation-x={-Math.PI / 2}>
         <circleGeometry args={[3.15, quality ? 120 : 84]} />
-        <meshBasicMaterial map={sceneHalo} transparent opacity={0.34} />
+        <meshBasicMaterial map={sceneHalo} transparent opacity={0.34} depthWrite={false} depthTest={false} />
       </mesh>
 
       <mesh position={[0, BASE_RING_Y - 0.04, 0]} rotation-x={Math.PI / 2}>
         <ringGeometry args={[BASE_RING_RADIUS * 0.66, BASE_RING_RADIUS * 1.6, quality ? 140 : 84]} />
-        <meshBasicMaterial color="#6ca4ff" transparent opacity={0.08} side={THREE.DoubleSide} />
+        <meshBasicMaterial
+          color="#6ca4ff"
+          transparent
+          opacity={0.08}
+          side={THREE.DoubleSide}
+          depthWrite={false}
+        />
       </mesh>
 
       <group position={[0, BASE_RING_Y, 0]} rotation-x={Math.PI / 2}>
@@ -255,11 +307,12 @@ const SolarSystem = ({
             emissiveIntensity={0.62}
             clearcoat={1}
             clearcoatRoughness={0.08}
+            depthWrite={false}
           />
         </mesh>
         <mesh>
           <torusGeometry args={[BASE_RING_RADIUS, 0.115, 14, quality ? 150 : 96]} />
-          <meshBasicMaterial color="#55b7ff" transparent opacity={0.16} />
+          <meshBasicMaterial color="#55b7ff" transparent opacity={0.16} depthWrite={false} />
         </mesh>
         {Array.from({ length: 10 }).map((_, index) => {
           const t = (index / 10) * Math.PI * 2;
@@ -283,41 +336,37 @@ const SolarSystem = ({
 
         <mesh>
           <sphereGeometry args={[CORE_RADIUS, quality ? 82 : 52, quality ? 82 : 52]} />
-          <meshPhysicalMaterial
-            color="#9bd4ff"
-            transparent
-            opacity={compact ? 0.46 : 0.36}
-            transmission={compact ? 0.45 : 0.95}
-            thickness={compact ? 0.45 : 1.35}
-            ior={1.12}
-            roughness={compact ? 0.14 : 0.07}
-            metalness={0.01}
-            clearcoat={1}
-            clearcoatRoughness={0.04}
-            emissive="#34c3ff"
-            emissiveIntensity={0.28}
-          />
+          <meshBasicMaterial color="#061024" transparent opacity={0.24} depthWrite={false} />
         </mesh>
+        <points>
+          <sphereGeometry args={[CORE_RADIUS * 0.98, quality ? 42 : 26, quality ? 42 : 26]} />
+          <pointsMaterial
+            map={dotTexture}
+            color="#4ec6ff"
+            transparent
+            opacity={0.9}
+            size={quality ? 0.02 : 0.018}
+            sizeAttenuation
+            depthWrite={false}
+            blending={THREE.AdditiveBlending}
+          />
+        </points>
+        <points>
+          <sphereGeometry args={[CORE_RADIUS * 1.005, quality ? 30 : 22, quality ? 30 : 22]} />
+          <pointsMaterial
+            map={dotTexture}
+            color="#80dcff"
+            transparent
+            opacity={0.34}
+            size={quality ? 0.014 : 0.012}
+            sizeAttenuation
+            depthWrite={false}
+            blending={THREE.AdditiveBlending}
+          />
+        </points>
         <mesh>
-          <sphereGeometry args={[CORE_RADIUS * 0.98, quality ? 72 : 44, quality ? 72 : 44]} />
-          <meshBasicMaterial
-            color="#8ad4ff"
-            transparent
-            opacity={0.12}
-            wireframe
-          />
-        </mesh>
-        <mesh position={[0, 0.0, 0]} rotation-x={Math.PI / 2}>
-          <torusGeometry args={[CORE_RADIUS, 0.028, 12, quality ? 120 : 76]} />
-          <meshBasicMaterial color="#67d8ff" transparent opacity={0.82} />
-        </mesh>
-        <mesh position={[0, 0.02, CORE_TEXT_Z]} renderOrder={10}>
-          <planeGeometry args={[0.62, 0.3]} />
-          <meshBasicMaterial map={iaTextTexture} transparent depthWrite={false} depthTest={false} />
-        </mesh>
-        <mesh position={[0.2, 0.34, CORE_RADIUS * 0.92]}>
-          <planeGeometry args={[0.56, 0.3]} />
-          <meshBasicMaterial map={coreHighlight} transparent opacity={0.56} />
+          <sphereGeometry args={[CORE_RADIUS * 1.03, quality ? 58 : 36, quality ? 58 : 36]} />
+          <meshBasicMaterial color="#38bfff" transparent opacity={0.1} side={THREE.BackSide} />
         </mesh>
       </group>
 
@@ -345,10 +394,10 @@ const SolarSystem = ({
             <meshStandardMaterial
               map={iconTextures[planet.icon]}
               transparent
-              emissive="#284b8f"
-              emissiveIntensity={0.17}
-              roughness={0.24}
-              metalness={0.16}
+              emissive="#1b3f88"
+              emissiveIntensity={0.2}
+              roughness={0.22}
+              metalness={0.12}
             />
           </mesh>
           <mesh position={[0, 0, TILE_DEPTH * 0.5]} rotation-x={-0.01}>
@@ -358,6 +407,11 @@ const SolarSystem = ({
         </group>
       ))}
     </group>
+    <mesh ref={iaLabelRef} position={[0, IA_LABEL_Y, IA_LABEL_Z]} renderOrder={30}>
+      <planeGeometry args={[0.62, 0.3]} />
+      <meshBasicMaterial map={iaTextTexture} transparent depthWrite={false} depthTest={false} />
+    </mesh>
+    </>
   );
 };
 
@@ -394,19 +448,19 @@ const OrbitTube = ({
   );
 };
 
-function makeCoreHighlightTexture() {
+function makeDotTexture() {
   const canvas = document.createElement("canvas");
-  canvas.width = 192;
-  canvas.height = 120;
+  canvas.width = 64;
+  canvas.height = 64;
   const ctx = canvas.getContext("2d");
   if (!ctx) return new THREE.Texture();
 
-  const gradient = ctx.createRadialGradient(76, 54, 8, 96, 60, 68);
-  gradient.addColorStop(0, "rgba(255,255,255,0.72)");
-  gradient.addColorStop(0.5, "rgba(214,228,255,0.32)");
-  gradient.addColorStop(1, "rgba(255,255,255,0)");
-  ctx.fillStyle = gradient;
-  ctx.fillRect(0, 0, 192, 120);
+  const radial = ctx.createRadialGradient(32, 32, 3, 32, 32, 28);
+  radial.addColorStop(0, "rgba(220,245,255,1)");
+  radial.addColorStop(0.5, "rgba(110,205,255,0.95)");
+  radial.addColorStop(1, "rgba(30,140,255,0)");
+  ctx.fillStyle = radial;
+  ctx.fillRect(0, 0, 64, 64);
 
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
@@ -438,28 +492,6 @@ function makeIATextTexture() {
   texture.colorSpace = THREE.SRGBColorSpace;
   texture.needsUpdate = true;
   return texture;
-}
-
-function makeIconTextures() {
-  const kinds: IconKind[] = ["chat", "gear", "chart", "cloud", "db", "flow", "bot", "shield"];
-  const result = {} as Record<IconKind, THREE.Texture>;
-
-  kinds.forEach((kind) => {
-    const canvas = document.createElement("canvas");
-    canvas.width = 256;
-    canvas.height = 256;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    drawTileFace(ctx, kind, canvas.width);
-
-    const texture = new THREE.CanvasTexture(canvas);
-    texture.colorSpace = THREE.SRGBColorSpace;
-    texture.needsUpdate = true;
-    result[kind] = texture;
-  });
-
-  return result;
 }
 
 function makeSceneHaloTexture() {
@@ -503,139 +535,4 @@ function makeSpikeTexture() {
   texture.colorSpace = THREE.SRGBColorSpace;
   texture.needsUpdate = true;
   return texture;
-}
-
-function drawTileFace(ctx: CanvasRenderingContext2D, type: IconKind, width: number) {
-  const panel = ctx.createLinearGradient(0, 0, width, width);
-  panel.addColorStop(0, "rgba(34,48,74,0.95)");
-  panel.addColorStop(1, "rgba(10,16,27,0.96)");
-  ctx.fillStyle = panel;
-  ctx.fillRect(0, 0, width, width);
-
-  const glow = ctx.createRadialGradient(width * 0.5, width * 0.32, 10, width * 0.5, width * 0.48, width * 0.46);
-  glow.addColorStop(0, "rgba(133,177,255,0.26)");
-  glow.addColorStop(1, "rgba(10,16,27,0)");
-  ctx.fillStyle = glow;
-  ctx.fillRect(0, 0, width, width);
-
-  ctx.strokeStyle = "rgba(210,228,255,0.98)";
-  ctx.lineWidth = 11;
-  ctx.lineCap = "round";
-  ctx.lineJoin = "round";
-  drawIcon(ctx, type, width);
-}
-
-function drawIcon(ctx: CanvasRenderingContext2D, type: IconKind, width: number) {
-  const c = width / 2;
-  drawIconPath(ctx, type, c);
-}
-
-function drawIconPath(ctx: CanvasRenderingContext2D, type: IconKind, c: number) {
-  if (type === "chat") {
-    roundRectPath(ctx, c - 48, c - 44, 96, 70, 16);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(c - 14, c + 26);
-    ctx.lineTo(c - 32, c + 46);
-    ctx.lineTo(c - 4, c + 31);
-    ctx.stroke();
-    return;
-  }
-  if (type === "gear") {
-    ctx.beginPath();
-    ctx.arc(c, c, 42, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.arc(c, c, 18, 0, Math.PI * 2);
-    ctx.stroke();
-    return;
-  }
-  if (type === "chart") {
-    ctx.beginPath();
-    ctx.moveTo(c - 52, c + 44);
-    ctx.lineTo(c - 52, c + 6);
-    ctx.moveTo(c - 6, c + 44);
-    ctx.lineTo(c - 6, c - 30);
-    ctx.moveTo(c + 42, c + 44);
-    ctx.lineTo(c + 42, c - 10);
-    ctx.stroke();
-    return;
-  }
-  if (type === "cloud") {
-    ctx.beginPath();
-    ctx.arc(c - 34, c + 8, 24, Math.PI * 0.7, Math.PI * 1.95);
-    ctx.arc(c - 2, c - 12, 32, Math.PI, Math.PI * 2);
-    ctx.arc(c + 36, c + 10, 20, Math.PI * 1.1, Math.PI * 2);
-    ctx.stroke();
-    return;
-  }
-  if (type === "db") {
-    ctx.beginPath();
-    ctx.ellipse(c, c - 34, 36, 14, 0, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(c - 36, c - 34);
-    ctx.lineTo(c - 36, c + 38);
-    ctx.moveTo(c + 36, c - 34);
-    ctx.lineTo(c + 36, c + 38);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.ellipse(c, c + 38, 36, 14, 0, 0, Math.PI);
-    ctx.stroke();
-    return;
-  }
-  if (type === "flow") {
-    ctx.beginPath();
-    ctx.moveTo(c - 54, c - 28);
-    ctx.lineTo(c - 12, c - 28);
-    ctx.lineTo(c - 12, c + 24);
-    ctx.lineTo(c + 48, c + 24);
-    ctx.stroke();
-    return;
-  }
-  if (type === "bot") {
-    roundRectPath(ctx, c - 42, c - 38, 84, 68, 14);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(c, c - 56);
-    ctx.lineTo(c, c - 40);
-    ctx.moveTo(c - 16, c - 6);
-    ctx.lineTo(c - 15, c - 6);
-    ctx.moveTo(c + 16, c - 6);
-    ctx.lineTo(c + 15, c - 6);
-    ctx.stroke();
-    return;
-  }
-
-  ctx.beginPath();
-  ctx.moveTo(c, c - 56);
-  ctx.lineTo(c - 42, c - 22);
-  ctx.lineTo(c - 33, c + 44);
-  ctx.lineTo(c + 33, c + 44);
-  ctx.lineTo(c + 42, c - 22);
-  ctx.closePath();
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(c - 16, c + 4);
-  ctx.lineTo(c - 2, c + 18);
-  ctx.lineTo(c + 20, c - 12);
-  ctx.stroke();
-}
-
-function roundRectPath(
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-  radius: number,
-) {
-  const r = Math.min(radius, width / 2, height / 2);
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.arcTo(x + width, y, x + width, y + height, r);
-  ctx.arcTo(x + width, y + height, x, y + height, r);
-  ctx.arcTo(x, y + height, x, y, r);
-  ctx.arcTo(x, y, x + width, y, r);
-  ctx.closePath();
 }
