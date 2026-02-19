@@ -5,7 +5,7 @@ import { getGsap } from "@/lib/gsap";
 import { useReducedMotionSafe } from "@/hooks/useReducedMotionSafe";
 
 const metrics = [
-  { label: "Speed", value: "80%", scale: 0.8 },
+  { label: "Velocidad", value: "80%", scale: 0.8 },
   { label: "Coste", value: "−35%", scale: 0.65 },
   { label: "Satisfacción", value: "+25%", scale: 0.72 },
 ];
