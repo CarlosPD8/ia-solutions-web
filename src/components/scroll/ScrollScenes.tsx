@@ -39,9 +39,8 @@ export const ScrollScenes = () => {
         });
 
         heroTl
-          .to(".scene-hero-copy", { yPercent: -18, opacity: 0.42, ease: "none" }, 0)
-          .to(".scene-hero-orbit", { yPercent: 10, scale: 0.93, opacity: 0.84, ease: "none" }, 0)
-          .to(".scene-orbit-inner", { rotate: 45, ease: "none" }, 0);
+          .to(".scene-hero-copy", { yPercent: -14, opacity: 0.48, ease: "none" }, 0)
+          .to(".scene-hero-orbit", { yPercent: 6, opacity: 0.9, ease: "none" }, 0);
 
         const serviceCards = gsap.utils.toArray<HTMLElement>(".scene-service-card");
         gsap.set(serviceCards, { transformPerspective: 1200, transformOrigin: "center center" });

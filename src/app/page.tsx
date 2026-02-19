@@ -1,10 +1,9 @@
-import { HeroApple } from "@/components/hero/HeroApple";
 import { CtaSection } from "@/components/home/CtaSection";
+import { HeroSection } from "@/components/home/HeroSection";
+import { HowItWorksSection } from "@/components/home/HowItWorksSection";
+import { ServicesSection } from "@/components/home/ServicesSection";
+import { TestimonialsSection } from "@/components/home/TestimonialsSection";
 import { MainLayout } from "@/components/layout/MainLayout";
-import { ScrollScenes } from "@/components/scroll/ScrollScenes";
-import { ProcessApple } from "@/components/sections/ProcessApple";
-import { ServicesApple } from "@/components/sections/ServicesApple";
-import { TestimonialsApple } from "@/components/sections/TestimonialsApple";
 import { getHomeContent } from "@/core/application/getHomeContent";
 
 export default function HomePage() {
@@ -13,15 +12,15 @@ export default function HomePage() {
   return (
     <MainLayout>
       <div data-scene-root>
-        <HeroApple
+        <HeroSection
           title={content.hero.title}
           subtitle={content.hero.subtitle}
           primaryCta={content.hero.primaryCta}
           secondaryCta={content.hero.secondaryCta}
         />
-        <ServicesApple services={content.services} />
-        <ProcessApple steps={content.howItWorks.steps} />
-        <TestimonialsApple testimonials={content.testimonials} />
+        <ServicesSection services={content.services} />
+        <HowItWorksSection steps={content.howItWorks.steps} />
+        <TestimonialsSection testimonials={content.testimonials} />
       </div>
 
       <CtaSection
@@ -29,8 +28,6 @@ export default function HomePage() {
         description={content.cta.description}
         buttonText={content.cta.buttonText}
       />
-
-      <ScrollScenes />
     </MainLayout>
   );
 }

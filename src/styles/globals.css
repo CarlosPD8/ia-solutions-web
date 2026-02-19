@@ -122,6 +122,45 @@ a {
   position: relative;
 }
 
+.scene-orbit-spin {
+  animation: orbit-spin var(--orbit-duration, 14s) linear infinite;
+}
+
+.scene-orbit-spin-reverse {
+  animation: orbit-spin-reverse var(--orbit-duration, 14s) linear infinite;
+}
+
+.scene-orbit-node-core {
+  animation: orbit-node-counter var(--orbit-duration, 14s) linear infinite;
+}
+
+@keyframes orbit-spin {
+  from {
+    transform: rotateX(66deg) rotateZ(0deg);
+  }
+  to {
+    transform: rotateX(66deg) rotateZ(360deg);
+  }
+}
+
+@keyframes orbit-spin-reverse {
+  from {
+    transform: rotateX(66deg) rotateZ(360deg);
+  }
+  to {
+    transform: rotateX(66deg) rotateZ(0deg);
+  }
+}
+
+@keyframes orbit-node-counter {
+  from {
+    transform: rotateX(-66deg) rotateZ(0deg);
+  }
+  to {
+    transform: rotateX(-66deg) rotateZ(-360deg);
+  }
+}
+
 @media (min-width: 1024px) {
   [data-scene-root] {
     scroll-snap-type: y proximity;
@@ -202,6 +241,12 @@ a {
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+
+  .scene-orbit-spin,
+  .scene-orbit-spin-reverse,
+  .scene-orbit-node-core {
+    animation: none !important;
   }
 
   *,
