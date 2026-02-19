@@ -25,8 +25,8 @@
   --color-secondary-800: #1e3a8a;
   --color-secondary-900: #172554;
 
-  --color-bg: var(--color-primary-900);
-  --color-bg-soft: #0b0e14;
+  --color-bg: var(--color-primary-800);
+  --color-bg-soft: #101722;
   --color-text: #f9fafb;
   --color-text-muted: #a6afbf;
   --color-border: rgba(255, 255, 255, 0.12);
@@ -43,7 +43,10 @@
 html {
   height: 100%;
   scroll-behavior: smooth;
-  background-color: var(--color-bg);
+  background:
+    radial-gradient(1200px 700px at 18% -8%, rgba(86, 138, 255, 0.14), rgba(7, 11, 18, 0) 62%),
+    radial-gradient(900px 520px at 88% 10%, rgba(141, 181, 255, 0.1), rgba(7, 11, 18, 0) 60%),
+    var(--color-bg);
   overflow-x: hidden;
   overflow-y: auto;
 }
