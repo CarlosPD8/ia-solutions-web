@@ -87,7 +87,7 @@ export const homeContentStaticRepository = {
           },
           {
             id: "4",
-            title: "Acompanamiento",
+            title: "Acompañamiento",
             description:
               "Formacion, soporte y mejora continua de los modelos y flujos implementados.",
           },
