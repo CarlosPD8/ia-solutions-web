@@ -31,8 +31,8 @@ const SYSTEM_SCALE_MOBILE = 0.9;
 const DRAG_SENSITIVITY = 0.0056;
 const MAX_DRAG_TILT_X = 0.24;
 const MAX_DRAG_TILT_Y = 0.58;
-const IA_LABEL_Y = 0.1;
-const IA_LABEL_Z = 1.05;
+const IA_LABEL_Y = 0.12;
+const IA_LABEL_Z = 1.12;
 
 type OrbitConfig = {
   radiusX: number;
@@ -212,18 +212,16 @@ const SolarSystem = ({
     return map;
   }, [iconTextureList]);
   const iaTextTexture = useMemo(() => makeIATextTexture(), []);
-  const dotTexture = useMemo(() => makeDotTexture(), []);
   const sceneHalo = useMemo(() => makeSceneHaloTexture(), []);
   const spikeTexture = useMemo(() => makeSpikeTexture(), []);
 
   useEffect(
     () => () => {
       iaTextTexture.dispose();
-      dotTexture.dispose();
       sceneHalo.dispose();
       spikeTexture.dispose();
     },
-    [dotTexture, iaTextTexture, sceneHalo, spikeTexture],
+    [iaTextTexture, sceneHalo, spikeTexture],
   );
 
   useFrame(({ clock, camera }, delta) => {
@@ -335,37 +333,46 @@ const SolarSystem = ({
 
         <mesh>
           <sphereGeometry args={[CORE_RADIUS, quality ? 82 : 52, quality ? 82 : 52]} />
-          <meshBasicMaterial color="#061024" transparent opacity={0.24} depthWrite={false} />
-        </mesh>
-        <points>
-          <sphereGeometry args={[CORE_RADIUS * 0.98, quality ? 42 : 26, quality ? 42 : 26]} />
-          <pointsMaterial
-            map={dotTexture}
-            color="#4ec6ff"
+          <meshPhysicalMaterial
+            color="#0d2d66"
             transparent
-            opacity={0.9}
-            size={quality ? 0.02 : 0.018}
-            sizeAttenuation
+            opacity={0.2}
+            transmission={0.55}
+            thickness={0.9}
+            roughness={0.08}
+            metalness={0.06}
+            emissive="#1ea8ff"
+            emissiveIntensity={0.34}
+            clearcoat={1}
+            clearcoatRoughness={0.12}
             depthWrite={false}
-            blending={THREE.AdditiveBlending}
           />
-        </points>
-        <points>
-          <sphereGeometry args={[CORE_RADIUS * 1.005, quality ? 30 : 22, quality ? 30 : 22]} />
-          <pointsMaterial
-            map={dotTexture}
-            color="#80dcff"
+        </mesh>
+        <mesh>
+          <sphereGeometry args={[CORE_RADIUS * 0.985, quality ? 18 : 12, quality ? 12 : 8]} />
+          <meshBasicMaterial
+            color="#59ccff"
+            wireframe
             transparent
             opacity={0.34}
-            size={quality ? 0.014 : 0.012}
-            sizeAttenuation
-            depthWrite={false}
             blending={THREE.AdditiveBlending}
+            depthWrite={false}
           />
-        </points>
+        </mesh>
+        <mesh rotation={[0.14, 0.42, 0]}>
+          <sphereGeometry args={[CORE_RADIUS * 1.008, quality ? 14 : 10, quality ? 10 : 7]} />
+          <meshBasicMaterial
+            color="#9ae5ff"
+            wireframe
+            transparent
+            opacity={0.16}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+          />
+        </mesh>
         <mesh>
           <sphereGeometry args={[CORE_RADIUS * 1.03, quality ? 58 : 36, quality ? 58 : 36]} />
-          <meshBasicMaterial color="#38bfff" transparent opacity={0.1} side={THREE.BackSide} />
+          <meshBasicMaterial color="#38bfff" transparent opacity={0.13} side={THREE.BackSide} />
         </mesh>
       </group>
 
@@ -446,26 +453,6 @@ const OrbitTube = ({
     </mesh>
   );
 };
-
-function makeDotTexture() {
-  const canvas = document.createElement("canvas");
-  canvas.width = 64;
-  canvas.height = 64;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return new THREE.Texture();
-
-  const radial = ctx.createRadialGradient(32, 32, 3, 32, 32, 28);
-  radial.addColorStop(0, "rgba(220,245,255,1)");
-  radial.addColorStop(0.5, "rgba(110,205,255,0.95)");
-  radial.addColorStop(1, "rgba(30,140,255,0)");
-  ctx.fillStyle = radial;
-  ctx.fillRect(0, 0, 64, 64);
-
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.colorSpace = THREE.SRGBColorSpace;
-  texture.needsUpdate = true;
-  return texture;
-}
 
 function makeIATextTexture() {
   const canvas = document.createElement("canvas");
