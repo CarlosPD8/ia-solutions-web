@@ -67,6 +67,42 @@ export const ServicesSection = ({ services }: Props) => {
     };
   };
 
+  const getMobileCardStyle = (relative: number) => {
+    if (relative === 0) {
+      return {
+        transform: "translate3d(-50%, 0, 0) scale(1)",
+        opacity: 1,
+        zIndex: 30,
+        pointerEvents: "auto" as const,
+      };
+    }
+
+    if (relative < 0) {
+      return {
+        transform: "translate3d(-90%, 0, 0) scale(0.92)",
+        opacity: 0.78,
+        zIndex: 20,
+        pointerEvents: "auto" as const,
+      };
+    }
+
+    if (relative > 0) {
+      return {
+        transform: "translate3d(-10%, 0, 0) scale(0.92)",
+        opacity: 0.78,
+        zIndex: 20,
+        pointerEvents: "auto" as const,
+      };
+    }
+
+    return {
+      transform: "translate3d(-50%, 0, 0) scale(0.74)",
+      opacity: 0,
+      zIndex: 1,
+      pointerEvents: "none" as const,
+    };
+  };
+
   return (
     <section id="servicios" data-scene="services" className="scene-panel border-b border-default bg-transparent">
       <div className="section-shell py-16 md:py-20">
@@ -80,24 +116,68 @@ export const ServicesSection = ({ services }: Props) => {
           </p>
         </div>
 
-        <div className="space-y-4 md:hidden">
-          {services.map((service, index) => (
-            <article key={service.id} className="surface-card p-6">
-              <div className="mb-3 text-xs font-medium tracking-[0.2em] text-secondary">
-                {String(index + 1).padStart(2, "0")}
-              </div>
-              <h3 className="text-xl font-semibold tracking-tight text-primary">{service.title}</h3>
-              <p className="mt-3 text-sm leading-7 text-muted">{service.shortDescription}</p>
-              <ul className="mt-5 space-y-3 text-sm text-muted">
-                {service.benefits.map((benefit) => (
-                  <li key={benefit} className="flex items-start gap-2.5">
-                    <span className="mt-2 h-1.5 w-1.5 rounded-full bg-secondary" />
-                    <span>{benefit}</span>
-                  </li>
-                ))}
-              </ul>
-            </article>
-          ))}
+        <div className="md:hidden">
+          <div className="relative mx-auto h-[31.5rem] w-full overflow-visible [perspective:1200px]">
+            {services.map((service, index) => {
+              const relative = getRelative(index);
+              const visible = visibleIndexes.has(index);
+              const isCenter = relative === 0;
+              const isLeft = relative < 0;
+              const style = visible ? getMobileCardStyle(relative) : getMobileCardStyle(99);
+
+              return (
+                <article
+                  key={`mobile-${service.id}`}
+                  style={style}
+                  className="surface-card absolute left-1/2 top-0 flex h-[31rem] w-[min(88vw,23.5rem)] flex-col p-6 will-change-transform transition-[transform,opacity] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                >
+                  {!isCenter ? (
+                    <button
+                      type="button"
+                      onClick={isLeft ? movePrev : moveNext}
+                      aria-label="Cambiar tarjeta de servicio"
+                      className="absolute inset-0 z-20 rounded-[inherit] cursor-pointer"
+                    />
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        onClick={movePrev}
+                        aria-label="Ir al servicio anterior"
+                        className="absolute bottom-0 left-0 top-0 z-20 w-1/2 rounded-l-[inherit]"
+                      />
+                      <button
+                        type="button"
+                        onClick={moveNext}
+                        aria-label="Ir al servicio siguiente"
+                        className="absolute bottom-0 right-0 top-0 z-20 w-1/2 rounded-r-[inherit]"
+                      />
+                    </>
+                  )}
+
+                  <div className="relative z-10 pointer-events-none">
+                    <div className="mb-5 inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/15 bg-white/[0.05]">
+                      <span className="h-2.5 w-2.5 rounded-full bg-secondary" />
+                    </div>
+
+                    <div className="mb-3 text-xs font-medium tracking-[0.2em] text-secondary">
+                      {String(index + 1).padStart(2, "0")}
+                    </div>
+                    <h3 className="text-xl font-semibold tracking-tight text-primary">{service.title}</h3>
+                    <p className="mt-3 text-sm leading-7 text-muted">{service.shortDescription}</p>
+                    <ul className="mt-5 space-y-3 text-sm text-muted">
+                      {service.benefits.map((benefit) => (
+                        <li key={benefit} className="flex items-start gap-2.5">
+                          <span className="mt-2 h-1.5 w-1.5 rounded-full bg-secondary" />
+                          <span>{benefit}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
         </div>
 
         <div className="hidden md:block">
