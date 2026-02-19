@@ -289,13 +289,13 @@ const SolarSystem = ({
         <mesh>
           <torusGeometry args={[BASE_RING_RADIUS, 0.07, 20, quality ? 180 : 110]} />
           <meshPhysicalMaterial
-            color="#59bcff"
+            color="#3f86ff"
             transparent
             opacity={0.95}
             roughness={0.2}
             metalness={0.08}
-            emissive="#24b4ff"
-            emissiveIntensity={0.62}
+            emissive="#1f6bff"
+            emissiveIntensity={0.72}
             clearcoat={1}
             clearcoatRoughness={0.08}
             depthWrite={false}
@@ -303,7 +303,7 @@ const SolarSystem = ({
         </mesh>
         <mesh>
           <torusGeometry args={[BASE_RING_RADIUS, 0.115, 14, quality ? 150 : 96]} />
-          <meshBasicMaterial color="#55b7ff" transparent opacity={0.16} depthWrite={false} />
+          <meshBasicMaterial color="#5b9bff" transparent opacity={0.2} depthWrite={false} />
         </mesh>
         {Array.from({ length: 10 }).map((_, index) => {
           const t = (index / 10) * Math.PI * 2;
@@ -328,15 +328,15 @@ const SolarSystem = ({
         <mesh>
           <sphereGeometry args={[CORE_RADIUS, quality ? 82 : 52, quality ? 82 : 52]} />
           <meshPhysicalMaterial
-            color="#0d2d66"
+            color="#1f6bff"
             transparent
-            opacity={0.2}
+            opacity={0.22}
             transmission={0.55}
             thickness={0.9}
             roughness={0.08}
             metalness={0.06}
-            emissive="#1ea8ff"
-            emissiveIntensity={0.34}
+            emissive="#2b75ff"
+            emissiveIntensity={0.42}
             clearcoat={1}
             clearcoatRoughness={0.12}
             depthWrite={false}
@@ -345,7 +345,7 @@ const SolarSystem = ({
         <mesh>
           <sphereGeometry args={[CORE_RADIUS * 0.985, quality ? 18 : 12, quality ? 12 : 8]} />
           <meshBasicMaterial
-            color="#59ccff"
+            color="#3f86ff"
             wireframe
             transparent
             opacity={0.34}
@@ -356,7 +356,7 @@ const SolarSystem = ({
         <mesh rotation={[0.14, 0.42, 0]}>
           <sphereGeometry args={[CORE_RADIUS * 1.008, quality ? 14 : 10, quality ? 10 : 7]} />
           <meshBasicMaterial
-            color="#9ae5ff"
+            color="#5b9bff"
             wireframe
             transparent
             opacity={0.16}
@@ -366,7 +366,7 @@ const SolarSystem = ({
         </mesh>
         <mesh>
           <sphereGeometry args={[CORE_RADIUS * 1.03, quality ? 58 : 36, quality ? 58 : 36]} />
-          <meshBasicMaterial color="#38bfff" transparent opacity={0.13} side={THREE.BackSide} />
+          <meshBasicMaterial color="#3f86ff" transparent opacity={0.16} side={THREE.BackSide} />
         </mesh>
       </group>
 
@@ -482,9 +482,9 @@ function makeSceneHaloTexture() {
   if (!ctx) return new THREE.Texture();
 
   const radial = ctx.createRadialGradient(320, 300, 30, 320, 320, 280);
-  radial.addColorStop(0, "rgba(190,216,255,0.42)");
-  radial.addColorStop(0.35, "rgba(114,156,255,0.18)");
-  radial.addColorStop(0.8, "rgba(68,98,170,0.06)");
+  radial.addColorStop(0, "rgba(122,171,255,0.44)");
+  radial.addColorStop(0.35, "rgba(63,134,255,0.24)");
+  radial.addColorStop(0.8, "rgba(31,107,255,0.08)");
   radial.addColorStop(1, "rgba(6,9,15,0)");
   ctx.fillStyle = radial;
   ctx.fillRect(0, 0, 640, 640);
@@ -503,11 +503,11 @@ function makeSpikeTexture() {
   if (!ctx) return new THREE.Texture();
 
   const grad = ctx.createLinearGradient(0, 0, 0, 256);
-  grad.addColorStop(0, "rgba(98,214,255,0)");
-  grad.addColorStop(0.25, "rgba(98,214,255,0.58)");
-  grad.addColorStop(0.5, "rgba(190,240,255,0.96)");
-  grad.addColorStop(0.75, "rgba(98,214,255,0.5)");
-  grad.addColorStop(1, "rgba(98,214,255,0)");
+  grad.addColorStop(0, "rgba(63,134,255,0)");
+  grad.addColorStop(0.25, "rgba(63,134,255,0.58)");
+  grad.addColorStop(0.5, "rgba(151,196,255,0.96)");
+  grad.addColorStop(0.75, "rgba(63,134,255,0.5)");
+  grad.addColorStop(1, "rgba(63,134,255,0)");
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, 64, 256);
 
