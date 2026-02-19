@@ -1,5 +1,5 @@
 import type { Variants } from "framer-motion";
-
+//a
 export const easeApple: [number, number, number, number] = [0.22, 0.61, 0.36, 1];
 
 export const enterUp: Variants = {
