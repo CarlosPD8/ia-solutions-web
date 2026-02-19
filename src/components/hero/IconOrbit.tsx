@@ -147,16 +147,16 @@ export const IconOrbit = ({ compact = false }: { compact?: boolean }) => {
         onCreated={({ gl }) => {
           gl.setClearColor(0x000000, 0);
           gl.toneMapping = THREE.ACESFilmicToneMapping;
-          gl.toneMappingExposure = compact ? 1.06 : 1.12;
+          gl.toneMappingExposure = compact ? 1 : 1.04;
           gl.outputColorSpace = THREE.SRGBColorSpace;
         }}
       >
         <ambientLight intensity={0.42} color="#9bb9f5" />
         <hemisphereLight intensity={0.44} color="#e9f1ff" groundColor="#070b13" />
-        <directionalLight position={[5, 4.1, 5]} intensity={1.05} color="#f6f9ff" />
-        <directionalLight position={[-4, 1.8, -3]} intensity={0.45} color="#4f7be6" />
-        <pointLight position={[0.1, 0.05, 1.85]} intensity={0.75} color="#85b3ff" />
-        <pointLight position={[-2.8, -1, 3.8]} intensity={0.42} color="#376ff1" />
+        <directionalLight position={[5, 4.1, 5]} intensity={0.75} color="#f6f9ff" />
+        <directionalLight position={[-4, 1.8, -3]} intensity={0.34} color="#4f7be6" />
+        <pointLight position={[0.1, 0.05, 1.85]} intensity={0.52} color="#85b3ff" />
+        <pointLight position={[-2.8, -1, 3.8]} intensity={0.3} color="#376ff1" />
         <Suspense fallback={<SolarFallback compact={compact} />}>
           <SolarSystem
             planets={planets}
@@ -218,15 +218,13 @@ const SolarSystem = ({
   }, [iconTextureList]);
   const iaTextTexture = useMemo(() => makeIATextTexture(), []);
   const sceneHalo = useMemo(() => makeSceneHaloTexture(), []);
-  const spikeTexture = useMemo(() => makeSpikeTexture(), []);
 
   useEffect(
     () => () => {
       iaTextTexture.dispose();
       sceneHalo.dispose();
-      spikeTexture.dispose();
     },
-    [iaTextTexture, sceneHalo, spikeTexture],
+    [iaTextTexture, sceneHalo],
   );
 
   useFrame(({ clock, camera }, delta) => {
@@ -292,32 +290,19 @@ const SolarSystem = ({
             color="#3f86ff"
             transparent
             opacity={0.95}
-            roughness={0.2}
-            metalness={0.08}
+            roughness={0.34}
+            metalness={0.02}
             emissive="#1f6bff"
-            emissiveIntensity={0.72}
-            clearcoat={1}
-            clearcoatRoughness={0.08}
+            emissiveIntensity={0.56}
+            clearcoat={0.35}
+            clearcoatRoughness={0.45}
             depthWrite={false}
           />
         </mesh>
         <mesh>
           <torusGeometry args={[BASE_RING_RADIUS, 0.115, 14, quality ? 150 : 96]} />
-          <meshBasicMaterial color="#5b9bff" transparent opacity={0.2} depthWrite={false} />
+          <meshBasicMaterial color="#5b9bff" transparent opacity={0.13} depthWrite={false} />
         </mesh>
-        {Array.from({ length: 10 }).map((_, index) => {
-          const t = (index / 10) * Math.PI * 2;
-          return (
-            <mesh
-              key={index}
-              position={[Math.cos(t) * BASE_RING_RADIUS, Math.sin(t) * BASE_RING_RADIUS, 0]}
-              rotation={[Math.PI / 2, 0, -t]}
-            >
-              <planeGeometry args={[0.08, 0.42]} />
-              <meshBasicMaterial map={spikeTexture} transparent opacity={0.58} depthWrite={false} />
-            </mesh>
-          );
-        })}
       </group>
 
       <group position={[0, 0.08, 0]}>
@@ -495,24 +480,3 @@ function makeSceneHaloTexture() {
   return texture;
 }
 
-function makeSpikeTexture() {
-  const canvas = document.createElement("canvas");
-  canvas.width = 64;
-  canvas.height = 256;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return new THREE.Texture();
-
-  const grad = ctx.createLinearGradient(0, 0, 0, 256);
-  grad.addColorStop(0, "rgba(63,134,255,0)");
-  grad.addColorStop(0.25, "rgba(63,134,255,0.58)");
-  grad.addColorStop(0.5, "rgba(151,196,255,0.96)");
-  grad.addColorStop(0.75, "rgba(63,134,255,0.5)");
-  grad.addColorStop(1, "rgba(63,134,255,0)");
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, 64, 256);
-
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.colorSpace = THREE.SRGBColorSpace;
-  texture.needsUpdate = true;
-  return texture;
-}
