@@ -162,7 +162,6 @@ export const IconOrbit = ({ compact = false }: { compact?: boolean }) => {
           />
         </Suspense>
       </Canvas>
-      <div className="pointer-events-none absolute inset-x-7 bottom-5 h-16 rounded-full border border-white/15 bg-[radial-gradient(180px_55px_at_50%_46%,rgba(179,203,255,0.2),rgba(9,12,20,0.45)_72%)] blur-[0.4px]" />
     </div>
   );
 };
