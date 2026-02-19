@@ -6,7 +6,7 @@ import { Suspense, useEffect, useMemo, useRef, type MutableRefObject, type Point
 import * as THREE from "three";
 import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 
-type IconKind = "react" | "whatsapp" | "n8n" | "sql" | "nextjs" | "docker" | "vercel" | "github";
+type IconKind = "react" | "whatsapp" | "n8n" | "sql" | "nextjs" | "docker" | "gmail" | "github";
 
 type PlanetConfig = {
   icon: IconKind;
@@ -58,7 +58,7 @@ const PLANETS: PlanetConfig[] = [
   { icon: "sql", orbit: 2, angleOffset: 0.86, speedFactor: 1.06, size: 0.48 },
   { icon: "nextjs", orbit: 1, angleOffset: 3.02, speedFactor: 0.98, size: 0.48 },
   { icon: "docker", orbit: 3, angleOffset: 5.18, speedFactor: 1.08, size: 0.46 },
-  { icon: "vercel", orbit: 2, angleOffset: 2.26, speedFactor: 1.1, size: 0.44 },
+  { icon: "gmail", orbit: 2, angleOffset: 2.26, speedFactor: 1.1, size: 0.44 },
   { icon: "github", orbit: 3, angleOffset: 4.5, speedFactor: 1.12, size: 0.44 },
 ];
 
@@ -69,7 +69,7 @@ const ICON_TEXTURE_URLS: Record<IconKind, string> = {
   sql: "/brand-icons/sql.svg",
   nextjs: "/brand-icons/nextjs.svg",
   docker: "/brand-icons/docker.svg",
-  vercel: "/brand-icons/vercel.svg",
+  gmail: "/brand-icons/gmail.svg",
   github: "/brand-icons/github.svg",
 };
 
