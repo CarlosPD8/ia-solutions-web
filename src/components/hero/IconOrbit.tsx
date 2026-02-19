@@ -68,6 +68,23 @@ export const IconOrbit = ({ compact = false }: { compact?: boolean }) => {
   const planets = compact ? PLANETS.slice(0, MOBILE_PLANET_COUNT) : PLANETS;
   const quality = !compact && !reduceMotion;
 
+  if (compact) {
+    return (
+      <div className="relative mx-auto h-[23rem] w-full max-w-[32rem] overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 rounded-[2rem] bg-[radial-gradient(460px_260px_at_48%_46%,rgba(112,158,255,0.2),rgba(7,10,16,0)_72%)]" />
+        <div className="absolute left-1/2 top-[57%] h-[11.2rem] w-[11.2rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-cyan-200/35 bg-[radial-gradient(circle_at_36%_28%,rgba(185,232,255,0.46),rgba(72,150,255,0.26)_52%,rgba(20,54,126,0.16)_76%,rgba(7,11,20,0.08)_100%)] shadow-[0_0_24px_rgba(56,185,255,0.35)]" />
+        <div className="absolute left-1/2 top-[57%] h-[11.7rem] w-[11.7rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-cyan-200/20" />
+        <div className="absolute left-1/2 top-[57%] h-[11.2rem] w-[11.2rem] -translate-x-1/2 -translate-y-1/2 rounded-full [mask-image:linear-gradient(to_bottom,transparent_52%,black_100%)] border border-cyan-200/18" />
+        <span className="absolute left-1/2 top-[57%] -translate-x-1/2 -translate-y-1/2 text-4xl font-semibold tracking-tight text-cyan-100/95 drop-shadow-[0_0_10px_rgba(129,210,255,0.65)]">
+          IA
+        </span>
+        <div className="absolute left-1/2 top-[70%] h-9 w-[13.8rem] -translate-x-1/2 -translate-y-1/2 rounded-[999px] border border-cyan-200/50 bg-cyan-300/35 shadow-[0_0_18px_rgba(56,186,255,0.7),inset_0_0_18px_rgba(178,235,255,0.65)]" />
+        <div className="absolute left-1/2 top-[70%] h-12 w-[14.6rem] -translate-x-1/2 -translate-y-1/2 rounded-[999px] border border-cyan-100/25 bg-cyan-300/8 blur-[1px]" />
+        <div className="pointer-events-none absolute inset-x-7 bottom-5 h-16 rounded-full border border-white/15 bg-[radial-gradient(180px_55px_at_50%_46%,rgba(179,203,255,0.2),rgba(9,12,20,0.45)_72%)] blur-[0.4px]" />
+      </div>
+    );
+  }
+
   const onPointerDown: PointerEventHandler<HTMLDivElement> = (event) => {
     dragState.current = {
       active: true,
