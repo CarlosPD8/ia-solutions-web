@@ -134,7 +134,7 @@ export const TestimonialsSection = ({ testimonials }: Props) => {
             Lo que dicen nuestros clientes
           </h2>
           <p className="mx-auto max-w-3xl text-sm leading-7 text-muted md:text-base">
-            Resultados medibles aplicando IA de forma estrategica, con foco en eficiencia, experiencia y crecimiento.
+            Resultados medibles aplicando IA de forma estratégica, con foco en eficiencia, experiencia y crecimiento.
           </p>
         </div>
 

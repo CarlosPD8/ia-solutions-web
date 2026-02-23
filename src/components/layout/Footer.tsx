@@ -19,8 +19,8 @@ export const Footer = () => {
               <span className="text-[1.8rem] font-semibold leading-none tracking-tight text-primary">Avancia</span>
             </div>
             <p className="max-w-xs text-sm leading-7 text-muted">
-              Implementamos soluciones de Inteligencia Artificial que mejoran procesos reales en tu
-              empresa: automatización, asistentes inteligentes y analítica avanzada.
+              Implementamos soluciones de Inteligencia Artificial que mejoran procesos reales en tu empresa:
+              automatización, asistentes inteligentes y analítica avanzada.
             </p>
           </div>
 
@@ -73,7 +73,7 @@ export const Footer = () => {
               <li>España</li>
             </ul>
             <a
-              href="https://wa.me/34670294712?text=Hola%20quiero%20información%20sobre%20una%20solución%20con%20IA"
+              href="https://wa.me/34670294712?text=Hola%20quiero%20informaci%C3%B3n%20sobre%20una%20soluci%C3%B3n%20con%20IA"
               target="_blank"
               rel="noopener noreferrer"
               className="btn-apple-primary focus-ring mt-4 px-4 py-2 text-sm font-medium"
