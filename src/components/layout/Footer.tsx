@@ -1,4 +1,6 @@
+import Image from "next/image";
 import Link from "next/link";
+import avanciaLogo from "@/assets/images/avancia.png";
 
 export const Footer = () => {
   return (
@@ -6,11 +8,15 @@ export const Footer = () => {
       <div className="section-shell py-14 md:py-16">
         <div className="grid gap-10 md:grid-cols-4">
           <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-secondary text-sm font-semibold text-white">
-                IA
-              </span>
-              <span className="text-[1.8rem] font-semibold tracking-tight text-primary">Avancia</span>
+            <div className="flex items-center gap-3">
+              <Image
+                src={avanciaLogo}
+                alt="Avancia logo"
+                width={40}
+                height={40}
+                className="h-10 w-10 shrink-0 rounded-md object-contain"
+              />
+              <span className="text-[1.8rem] font-semibold leading-none tracking-tight text-primary">Avancia</span>
             </div>
             <p className="max-w-xs text-sm leading-7 text-muted">
               Implementamos soluciones de Inteligencia Artificial que mejoran procesos reales en tu

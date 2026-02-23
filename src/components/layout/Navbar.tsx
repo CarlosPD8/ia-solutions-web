@@ -1,8 +1,10 @@
 "use client";
 
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import avanciaLogo from "@/assets/images/avancia.png";
 
 const navLinks = [
   { href: "#servicios", label: "Servicios" },
@@ -26,11 +28,16 @@ export const Navbar = () => {
   return (
     <header className="sticky top-0 z-30 border-b border-white/10 bg-black/45 backdrop-blur-[6px]">
       <nav className="section-shell flex h-[4.5rem] items-center justify-between">
-        <Link href="/" className="focus-ring flex items-center gap-2.5 rounded-xl px-1 py-1">
-          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-secondary text-sm font-semibold text-white">
-            IA
-          </span>
-          <span className="text-[1.8rem] font-semibold tracking-tight text-primary">Avancia</span>
+        <Link href="/" className="focus-ring flex items-center gap-3 rounded-xl px-1 py-1">
+          <Image
+            src={avanciaLogo}
+            alt="Avancia logo"
+            width={40}
+            height={40}
+            className="h-10 w-10 shrink-0 rounded-md object-contain"
+            priority
+          />
+          <span className="text-[1.8rem] font-semibold leading-none tracking-tight text-primary">Avancia</span>
         </Link>
 
         <div className="hidden items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] p-1 md:flex">
