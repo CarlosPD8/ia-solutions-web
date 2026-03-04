@@ -3,6 +3,8 @@
 import { motion } from "framer-motion";
 import { enterUp } from "@/components/motion/presets";
 
+const CALENDLY_URL = "https://calendly.com/avancia-avanciatech/30min";
+
 type Props = {
   title: string;
   description: string;
@@ -21,7 +23,7 @@ export const CtaSection = ({ title, description, buttonText }: Props) => {
         <motion.div variants={enterUp} className="surface-card relative overflow-hidden p-8 md:p-10">
           <div className="absolute inset-0 bg-[radial-gradient(540px_220px_at_10%_10%,rgba(31,107,255,0.22),transparent_58%)]" />
 
-          <div className="relative flex flex-col gap-7 md:flex-row md:items-center md:justify-between">
+          <div className="relative flex flex-col gap-7">
             <div className="space-y-3">
               <h2 className="max-w-2xl text-3xl font-semibold tracking-tight text-primary md:text-4xl">
                 {title}
@@ -30,10 +32,10 @@ export const CtaSection = ({ title, description, buttonText }: Props) => {
             </div>
 
             <a
-              href="https://wa.me/34670294712?text=Hola%20quiero%20informaci%C3%B3n%20sobre%20una%20soluci%C3%B3n%20con%20IA"
+              href={CALENDLY_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-apple-primary focus-ring px-6 py-3 text-sm font-medium"
+              className="btn-apple-primary focus-ring w-full px-6 py-3 text-center text-sm font-medium md:w-fit"
             >
               {buttonText}
             </a>

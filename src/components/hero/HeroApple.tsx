@@ -8,6 +8,8 @@ const IconOrbit = dynamic(() => import("@/components/hero/IconOrbit").then((m) =
   ssr: false,
 });
 
+const CALENDLY_URL = "https://calendly.com/avancia-avanciatech/30min";
+
 type HeroAppleProps = {
   title: string;
   subtitle: string;
@@ -71,7 +73,7 @@ export const HeroApple = ({ title, subtitle, primaryCta, secondaryCta }: HeroApp
 
             <div className="flex flex-col gap-3 sm:flex-row">
               <a
-                href="https://wa.me/34670294712?text=Hola%20quiero%20informaci%C3%B3n%20sobre%20una%20soluci%C3%B3n%20con%20IA"
+                href={CALENDLY_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn-apple-primary focus-ring px-6 py-3 text-sm font-medium"

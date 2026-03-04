@@ -6,6 +6,8 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import avanciaLogo from "@/assets/images/avancia.png";
 
+const CALENDLY_URL = "https://calendly.com/avancia-avanciatech/30min";
+
 const navLinks = [
   { href: "#servicios", label: "Servicios" },
   { href: "#como-funciona", label: "Cómo trabajamos" },
@@ -53,7 +55,7 @@ export const Navbar = () => {
         </div>
 
         <a
-          href="https://wa.me/34670294712?text=Hola%20quiero%20informaci%C3%B3n%20sobre%20una%20soluci%C3%B3n%20con%20IA"
+          href={CALENDLY_URL}
           target="_blank"
           rel="noopener noreferrer"
           className="btn-apple-primary focus-ring hidden px-4 py-2 text-sm font-medium md:inline-flex"
@@ -107,7 +109,9 @@ export const Navbar = () => {
                 </a>
               ))}
               <a
-                href="#contacto"
+                href={CALENDLY_URL}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="btn-apple-primary focus-ring mt-2 px-4 py-2.5 text-sm font-medium"
                 onClick={() => setOpen(false)}
               >
