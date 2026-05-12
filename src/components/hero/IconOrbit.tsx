@@ -424,6 +424,7 @@ const SolarSystem = ({
               depthWrite={false}
             />
           </mesh>
+          
           <mesh position={[0, 0, TILE_DEPTH * 0.48]}>
             <planeGeometry args={[planet.size * 1.0, planet.size * 0.9]} />
             <meshBasicMaterial
