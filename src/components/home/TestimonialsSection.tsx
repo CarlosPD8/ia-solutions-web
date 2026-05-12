@@ -149,7 +149,9 @@ export const TestimonialsSection = ({ testimonials }: Props) => {
               aria-label="Testimonio anterior"
               className="focus-ring inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/[0.03] text-primary transition hover:bg-white/[0.08]"
             >
-              ‹
+              <svg viewBox="0 0 16 16" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M10 12 6 8l4-4" />
+              </svg>
             </button>
             <button
               type="button"
@@ -157,7 +159,9 @@ export const TestimonialsSection = ({ testimonials }: Props) => {
               aria-label="Testimonio siguiente"
               className="focus-ring inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/[0.03] text-primary transition hover:bg-white/[0.08]"
             >
-              ›
+              <svg viewBox="0 0 16 16" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M6 4l4 4-4 4" />
+              </svg>
             </button>
           </div>
         </div>
@@ -180,15 +184,41 @@ export const TestimonialsSection = ({ testimonials }: Props) => {
                 data-testimonial-card
                 className="js-testimonial-card w-full shrink-0"
               >
-                <div className="surface-card relative p-6 md:p-7">
-                  <div className="pointer-events-none absolute -right-10 -top-12 h-36 w-36 rounded-full bg-secondary/20 blur-3xl" />
+                <div className="surface-card relative overflow-hidden p-6 md:p-8">
+                  <div className="pointer-events-none absolute -right-8 -top-10 h-36 w-36 rounded-full bg-secondary/20 blur-3xl" />
+                  <div className="pointer-events-none absolute -left-6 -bottom-8 h-28 w-28 rounded-full bg-violet-500/10 blur-2xl" />
+
+                  <svg
+                    viewBox="0 0 40 28"
+                    className="mb-4 h-7 w-7 opacity-30"
+                    fill="currentColor"
+                    aria-hidden="true"
+                    style={{ color: "#5c96ff" }}
+                  >
+                    <path d="M0 28V17.5C0 7.833 5.333 2.167 16 .5L18 4C13.333 5.167 10.333 7.5 9 11h7V28H0Zm22 0V17.5C22 7.833 27.333 2.167 38 .5L40 4c-4.667 1.167-7.667 3.5-9 7h7V28H22Z" />
+                  </svg>
+
                   <div className="relative z-10">
+                    <div className="mb-4 flex gap-0.5">
+                      {[...Array(5)].map((_, i) => (
+                        <svg key={i} viewBox="0 0 12 12" className="h-3.5 w-3.5" fill="#f59e0b" aria-hidden="true">
+                          <path d="M6 .5l1.4 2.9 3.1.4-2.2 2.2.5 3.1L6 7.7 3.2 9.1l.5-3.1L1.5 3.8l3.1-.4L6 .5Z" />
+                        </svg>
+                      ))}
+                    </div>
+
                     <p className="text-xl leading-8 tracking-tight text-primary md:text-2xl md:leading-[1.45]">
-                      {`“${testimonial.quote}”`}
+                      {testimonial.quote}
                     </p>
-                    <div className="mt-6 border-t border-white/10 pt-4 text-sm text-muted">
-                      <p className="text-base font-semibold text-primary">{testimonial.name}</p>
-                      <p>{`${testimonial.role}, ${testimonial.company}`}</p>
+
+                    <div className="mt-6 flex items-center gap-3 border-t border-white/10 pt-5">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/[0.06] text-sm font-semibold text-primary">
+                        {testimonial.name.charAt(0)}
+                      </div>
+                      <div className="text-sm text-muted">
+                        <p className="font-semibold text-primary">{testimonial.name}</p>
+                        <p>{testimonial.role} {"·"} {testimonial.company}</p>
+                      </div>
                     </div>
                   </div>
                 </div>

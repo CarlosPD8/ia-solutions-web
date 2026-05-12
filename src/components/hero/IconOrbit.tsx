@@ -17,11 +17,11 @@ type PlanetConfig = {
 };
 
 const CORE_RADIUS = 0.86;
-const CORE_BASE_ROTATION_SPEED = 0.13;
+const CORE_BASE_ROTATION_SPEED = 0.14;
 const CORE_IDLE_TILT_X = -0.18;
 const CORE_IDLE_TILT_Z = -0.05;
-const TILE_DEPTH = 0.12;
-const TILE_FLOAT_AMPLITUDE = 0.03;
+const TILE_DEPTH = 0.14;
+const TILE_FLOAT_AMPLITUDE = 0.034;
 const MOBILE_PLANET_COUNT = 5;
 const CORE_TEXT_Z = CORE_RADIUS * 0.7;
 const BASE_RING_RADIUS = 1.84;
@@ -32,7 +32,7 @@ const DRAG_SENSITIVITY = 0.0056;
 const MAX_DRAG_TILT_X = 0.24;
 const MAX_DRAG_TILT_Y = 0.58;
 const IA_LABEL_Y = 0.12;
-const IA_LABEL_Z = 1.12;
+const IA_LABEL_Z = 1.16;
 
 type OrbitConfig = {
   radiusX: number;
@@ -52,14 +52,14 @@ const ORBITS: OrbitConfig[] = [
 ];
 
 const PLANETS: PlanetConfig[] = [
-  { icon: "react", orbit: 0, angleOffset: 0.2, speedFactor: 0.95, size: 0.52 },
-  { icon: "whatsapp", orbit: 1, angleOffset: 1.65, speedFactor: 0.92, size: 0.5 },
-  { icon: "n8n", orbit: 0, angleOffset: 3.72, speedFactor: 1.01, size: 0.52 },
-  { icon: "sql", orbit: 2, angleOffset: 0.86, speedFactor: 1.06, size: 0.48 },
-  { icon: "nextjs", orbit: 1, angleOffset: 3.02, speedFactor: 0.98, size: 0.48 },
-  { icon: "docker", orbit: 3, angleOffset: 5.18, speedFactor: 1.08, size: 0.46 },
-  { icon: "gmail", orbit: 2, angleOffset: 2.26, speedFactor: 1.1, size: 0.44 },
-  { icon: "github", orbit: 3, angleOffset: 4.5, speedFactor: 1.12, size: 0.44 },
+  { icon: "react", orbit: 0, angleOffset: 0.2, speedFactor: 0.95, size: 0.60 },
+  { icon: "whatsapp", orbit: 1, angleOffset: 1.65, speedFactor: 0.92, size: 0.58 },
+  { icon: "n8n", orbit: 0, angleOffset: 3.72, speedFactor: 1.01, size: 0.60 },
+  { icon: "sql", orbit: 2, angleOffset: 0.86, speedFactor: 1.06, size: 0.56 },
+  { icon: "nextjs", orbit: 1, angleOffset: 3.02, speedFactor: 0.98, size: 0.56 },
+  { icon: "docker", orbit: 3, angleOffset: 5.18, speedFactor: 1.08, size: 0.53 },
+  { icon: "gmail", orbit: 2, angleOffset: 2.26, speedFactor: 1.1, size: 0.51 },
+  { icon: "github", orbit: 3, angleOffset: 4.5, speedFactor: 1.12, size: 0.51 },
 ];
 
 const ICON_TEXTURE_URLS: Record<IconKind, string> = {
@@ -147,16 +147,18 @@ export const IconOrbit = ({ compact = false }: { compact?: boolean }) => {
         onCreated={({ gl }) => {
           gl.setClearColor(0x000000, 0);
           gl.toneMapping = THREE.ACESFilmicToneMapping;
-          gl.toneMappingExposure = compact ? 1 : 1.04;
+          gl.toneMappingExposure = compact ? 1.12 : 1.22;
           gl.outputColorSpace = THREE.SRGBColorSpace;
         }}
       >
-        <ambientLight intensity={0.42} color="#9bb9f5" />
-        <hemisphereLight intensity={0.44} color="#e9f1ff" groundColor="#070b13" />
-        <directionalLight position={[5, 4.1, 5]} intensity={0.75} color="#f6f9ff" />
-        <directionalLight position={[-4, 1.8, -3]} intensity={0.34} color="#4f7be6" />
-        <pointLight position={[0.1, 0.05, 1.85]} intensity={0.52} color="#85b3ff" />
-        <pointLight position={[-2.8, -1, 3.8]} intensity={0.3} color="#376ff1" />
+        <ambientLight intensity={0.22} color="#8ab5f8" />
+        <hemisphereLight intensity={0.26} color="#e8eeff" groundColor="#04060f" />
+        <directionalLight position={[6, 5, 6]} intensity={1.3} color="#f0f5ff" />
+        <directionalLight position={[-5, 3, -4]} intensity={0.62} color="#818cf8" />
+        <pointLight position={[0.1, 0.1, 2.2]} intensity={1.1} color="#6e95ff" />
+        <pointLight position={[-3.2, -2, 4.5]} intensity={0.48} color="#5046e5" />
+        <pointLight position={[2.5, 3.2, -3.5]} intensity={0.62} color="#c7d2fe" />
+        <pointLight position={[-1.5, -2.5, -2]} intensity={0.26} color="#2255dd" />
         <Suspense fallback={<SolarFallback compact={compact} />}>
           <SolarSystem
             planets={planets}
@@ -285,23 +287,39 @@ const SolarSystem = ({
 
       <group position={[0, BASE_RING_Y, 0]} rotation-x={Math.PI / 2}>
         <mesh>
-          <torusGeometry args={[BASE_RING_RADIUS, 0.07, 20, quality ? 180 : 110]} />
+          <torusGeometry args={[BASE_RING_RADIUS, 0.065, 24, quality ? 200 : 120]} />
           <meshPhysicalMaterial
-            color="#3f86ff"
+            color="#5080ff"
             transparent
-            opacity={0.95}
-            roughness={0.34}
-            metalness={0.02}
-            emissive="#1f6bff"
-            emissiveIntensity={0.56}
-            clearcoat={0.35}
-            clearcoatRoughness={0.45}
+            opacity={1}
+            roughness={0.12}
+            metalness={0.08}
+            emissive="#2a50ff"
+            emissiveIntensity={1.3}
+            clearcoat={1}
+            clearcoatRoughness={0.18}
             depthWrite={false}
           />
         </mesh>
         <mesh>
-          <torusGeometry args={[BASE_RING_RADIUS, 0.115, 14, quality ? 150 : 96]} />
-          <meshBasicMaterial color="#5b9bff" transparent opacity={0.13} depthWrite={false} />
+          <torusGeometry args={[BASE_RING_RADIUS, 0.2, 12, quality ? 160 : 96]} />
+          <meshBasicMaterial
+            color="#6080ff"
+            transparent
+            opacity={0.16}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+          />
+        </mesh>
+        <mesh>
+          <torusGeometry args={[BASE_RING_RADIUS * 0.96, 0.038, 12, quality ? 120 : 72]} />
+          <meshBasicMaterial
+            color="#a0b8ff"
+            transparent
+            opacity={0.28}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+          />
         </mesh>
       </group>
 
@@ -311,47 +329,57 @@ const SolarSystem = ({
         ))}
 
         <mesh>
-          <sphereGeometry args={[CORE_RADIUS, quality ? 82 : 52, quality ? 82 : 52]} />
+          <sphereGeometry args={[CORE_RADIUS, quality ? 100 : 58, quality ? 100 : 58]} />
           <meshPhysicalMaterial
-            color="#1f6bff"
+            color="#1640ff"
+            transparent
+            opacity={0.15}
+            transmission={0.82}
+            thickness={1.6}
+            roughness={0.03}
+            metalness={0.0}
+            emissive="#3560ff"
+            emissiveIntensity={0.68}
+            clearcoat={1}
+            clearcoatRoughness={0.04}
+            iridescence={0.78}
+            iridescenceIOR={1.46}
+            iridescenceThicknessRange={[120, 900]}
+            depthWrite={false}
+          />
+        </mesh>
+        <mesh>
+          <sphereGeometry args={[CORE_RADIUS * 0.984, quality ? 24 : 14, quality ? 16 : 10]} />
+          <meshBasicMaterial
+            color="#4f72ff"
+            wireframe
             transparent
             opacity={0.22}
-            transmission={0.55}
-            thickness={0.9}
-            roughness={0.08}
-            metalness={0.06}
-            emissive="#2b75ff"
-            emissiveIntensity={0.42}
-            clearcoat={1}
-            clearcoatRoughness={0.12}
-            depthWrite={false}
-          />
-        </mesh>
-        <mesh>
-          <sphereGeometry args={[CORE_RADIUS * 0.985, quality ? 18 : 12, quality ? 12 : 8]} />
-          <meshBasicMaterial
-            color="#3f86ff"
-            wireframe
-            transparent
-            opacity={0.34}
             blending={THREE.AdditiveBlending}
             depthWrite={false}
           />
         </mesh>
-        <mesh rotation={[0.14, 0.42, 0]}>
-          <sphereGeometry args={[CORE_RADIUS * 1.008, quality ? 14 : 10, quality ? 10 : 7]} />
+        <mesh rotation={[0.18, 0.48, 0.1]}>
+          <sphereGeometry args={[CORE_RADIUS * 1.012, quality ? 17 : 11, quality ? 12 : 8]} />
           <meshBasicMaterial
-            color="#5b9bff"
+            color="#8090ff"
             wireframe
             transparent
-            opacity={0.16}
+            opacity={0.1}
             blending={THREE.AdditiveBlending}
             depthWrite={false}
           />
         </mesh>
         <mesh>
-          <sphereGeometry args={[CORE_RADIUS * 1.03, quality ? 58 : 36, quality ? 58 : 36]} />
-          <meshBasicMaterial color="#3f86ff" transparent opacity={0.16} side={THREE.BackSide} />
+          <sphereGeometry args={[CORE_RADIUS * 1.05, quality ? 64 : 40, quality ? 64 : 40]} />
+          <meshBasicMaterial
+            color="#4060ff"
+            transparent
+            opacity={0.2}
+            side={THREE.BackSide}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+          />
         </mesh>
       </group>
 
@@ -363,37 +391,54 @@ const SolarSystem = ({
             planetRefs.current[index] = node;
           }}
         >
-          <RoundedBox args={[planet.size, planet.size * 0.76, TILE_DEPTH]} radius={0.07} smoothness={5}>
+          <RoundedBox args={[planet.size, planet.size * 0.82, TILE_DEPTH]} radius={0.09} smoothness={6}>
             <meshPhysicalMaterial
-              color="#0a0f1a"
-              roughness={0.34}
-              metalness={0.46}
+              color="#060c1e"
+              roughness={0.16}
+              metalness={0.74}
               clearcoat={1}
-              clearcoatRoughness={0.24}
-              emissive="#101b31"
-              emissiveIntensity={0.14}
+              clearcoatRoughness={0.09}
+              emissive="#0a1630"
+              emissiveIntensity={0.32}
+              reflectivity={0.9}
             />
           </RoundedBox>
           <mesh position={[0, 0, TILE_DEPTH * 0.52 + 0.006]}>
-            <planeGeometry args={[planet.size * 0.58, planet.size * 0.58]} />
+            <planeGeometry args={[planet.size * 0.62, planet.size * 0.62]} />
             <meshStandardMaterial
               map={iconTextures[planet.icon]}
               transparent
-              emissive="#1b3f88"
-              emissiveIntensity={0.2}
-              roughness={0.22}
-              metalness={0.12}
+              emissive="#1a3888"
+              emissiveIntensity={0.58}
+              roughness={0.14}
+              metalness={0.1}
             />
           </mesh>
-          <mesh position={[0, 0, TILE_DEPTH * 0.5]} rotation-x={-0.01}>
-            <planeGeometry args={[planet.size * 0.74, planet.size * 0.53]} />
-            <meshBasicMaterial color="#d9e7ff" transparent opacity={0.06} />
+          <mesh position={[0, planet.size * 0.1, TILE_DEPTH * 0.5]} rotation-x={-0.01}>
+            <planeGeometry args={[planet.size * 0.84, planet.size * 0.28]} />
+            <meshBasicMaterial
+              color="#d8e8ff"
+              transparent
+              opacity={0.09}
+              blending={THREE.AdditiveBlending}
+              depthWrite={false}
+            />
+          </mesh>
+          <mesh position={[0, 0, TILE_DEPTH * 0.48]}>
+            <planeGeometry args={[planet.size * 1.0, planet.size * 0.9]} />
+            <meshBasicMaterial
+              color="#4466ff"
+              transparent
+              opacity={0.06}
+              blending={THREE.AdditiveBlending}
+              depthWrite={false}
+            />
           </mesh>
         </group>
       ))}
     </group>
     <mesh ref={iaLabelRef} position={[0, IA_LABEL_Y, IA_LABEL_Z]} renderOrder={30}>
-      <planeGeometry args={[0.62, 0.3]} />
+      <planeGeometry args={[0.74, 0.36]} />
       <meshBasicMaterial map={iaTextTexture} transparent depthWrite={false} depthTest={false} />
     </mesh>
     </>
@@ -419,15 +464,15 @@ const OrbitTube = ({
   return (
     <mesh geometry={geometry} rotation={[orbit.tiltX, 0, orbit.tiltZ]}>
       <meshPhysicalMaterial
-        color="#d6e5ff"
+        color="#b0c4ff"
         transparent
-        opacity={compact ? orbit.opacity * 0.9 : orbit.opacity}
-        roughness={0.42}
-        metalness={0.14}
-        emissive="#6b94f3"
-        emissiveIntensity={0.1}
-        clearcoat={0.92}
-        clearcoatRoughness={0.34}
+        opacity={compact ? orbit.opacity * 0.95 : orbit.opacity * 1.3}
+        roughness={0.08}
+        metalness={0.0}
+        emissive="#7080ff"
+        emissiveIntensity={1.6}
+        clearcoat={1}
+        clearcoatRoughness={0.08}
       />
     </mesh>
   );
@@ -435,23 +480,30 @@ const OrbitTube = ({
 
 function makeIATextTexture() {
   const canvas = document.createElement("canvas");
-  canvas.width = 384;
-  canvas.height = 176;
+  canvas.width = 512;
+  canvas.height = 224;
   const ctx = canvas.getContext("2d");
   if (!ctx) return new THREE.Texture();
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-  gradient.addColorStop(0, "rgba(238,247,255,0.98)");
-  gradient.addColorStop(1, "rgba(174,209,255,0.98)");
-  ctx.fillStyle = gradient;
-  ctx.shadowColor = "rgba(149,196,255,0.55)";
-  ctx.shadowBlur = 18;
-  ctx.font = "700 118px Manrope, system-ui, sans-serif";
+
+  ctx.font = "800 148px Manrope, system-ui, sans-serif";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
+
+  ctx.shadowColor = "rgba(90, 150, 255, 0.7)";
+  ctx.shadowBlur = 52;
+  const gradient = ctx.createLinearGradient(80, 0, canvas.width - 80, canvas.height);
+  gradient.addColorStop(0, "rgba(232, 244, 255, 1)");
+  gradient.addColorStop(0.48, "rgba(200, 225, 255, 0.99)");
+  gradient.addColorStop(1, "rgba(170, 202, 255, 0.97)");
+  ctx.fillStyle = gradient;
   ctx.fillText("IA", canvas.width / 2, canvas.height / 2 + 2);
-  ctx.shadowBlur = 0;
+
+  ctx.shadowColor = "rgba(70, 120, 255, 0.45)";
+  ctx.shadowBlur = 90;
+  ctx.fillStyle = "rgba(255, 255, 255, 0.28)";
+  ctx.fillText("IA", canvas.width / 2, canvas.height / 2 + 2);
 
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
@@ -461,18 +513,19 @@ function makeIATextTexture() {
 
 function makeSceneHaloTexture() {
   const canvas = document.createElement("canvas");
-  canvas.width = 640;
-  canvas.height = 640;
+  canvas.width = 800;
+  canvas.height = 800;
   const ctx = canvas.getContext("2d");
   if (!ctx) return new THREE.Texture();
 
-  const radial = ctx.createRadialGradient(320, 300, 30, 320, 320, 280);
-  radial.addColorStop(0, "rgba(122,171,255,0.44)");
-  radial.addColorStop(0.35, "rgba(63,134,255,0.24)");
-  radial.addColorStop(0.8, "rgba(31,107,255,0.08)");
-  radial.addColorStop(1, "rgba(6,9,15,0)");
+  const radial = ctx.createRadialGradient(400, 388, 14, 400, 400, 380);
+  radial.addColorStop(0, "rgba(140, 188, 255, 0.58)");
+  radial.addColorStop(0.22, "rgba(80, 138, 255, 0.38)");
+  radial.addColorStop(0.48, "rgba(105, 68, 240, 0.16)");
+  radial.addColorStop(0.72, "rgba(38, 68, 200, 0.07)");
+  radial.addColorStop(1, "rgba(6, 9, 15, 0)");
   ctx.fillStyle = radial;
-  ctx.fillRect(0, 0, 640, 640);
+  ctx.fillRect(0, 0, 800, 800);
 
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;

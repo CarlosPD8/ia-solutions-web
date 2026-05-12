@@ -20,25 +20,53 @@ export const CtaSection = ({ title, description, buttonText }: Props) => {
         whileInView="show"
         viewport={{ once: true, amount: 0.2 }}
       >
-        <motion.div variants={enterUp} className="surface-card relative overflow-hidden p-8 md:p-10">
-          <div className="absolute inset-0 bg-[radial-gradient(540px_220px_at_10%_10%,rgba(31,107,255,0.22),transparent_58%)]" />
+        <motion.div variants={enterUp} className="surface-card relative overflow-hidden p-8 md:p-12">
+          <div className="absolute inset-0 bg-[radial-gradient(700px_340px_at_8%_8%,rgba(26,98,255,0.26),transparent_55%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(500px_260px_at_92%_92%,rgba(120,70,240,0.14),transparent_60%)]" />
+          <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-secondary/10 blur-3xl" />
 
-          <div className="relative flex flex-col gap-7">
-            <div className="space-y-3">
-              <h2 className="max-w-2xl text-3xl font-semibold tracking-tight text-primary md:text-4xl">
+          <div className="relative flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
+            <div className="space-y-4 md:max-w-xl">
+              <div className="inline-flex items-center gap-2 rounded-full border border-secondary/30 bg-secondary/[0.07] px-3.5 py-1.5 text-xs font-medium text-secondary">
+                <span className="h-1.5 w-1.5 rounded-full bg-secondary" />
+                Oferta limitada
+              </div>
+              <h2 className="text-3xl font-semibold tracking-tight text-primary md:text-4xl lg:text-[2.6rem] lg:leading-[1.1]">
                 {title}
               </h2>
-              <p className="max-w-2xl text-sm leading-7 text-muted md:text-base">{description}</p>
+              <p className="text-sm leading-7 text-muted md:text-base">{description}</p>
             </div>
 
-            <a
-              href={CALENDLY_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-apple-primary focus-ring w-full px-6 py-3 text-center text-sm font-medium md:w-fit"
-            >
-              {buttonText}
-            </a>
+            <div className="flex flex-col items-start gap-4 md:items-end md:shrink-0">
+              <a
+                href={CALENDLY_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-apple-primary focus-ring w-full px-8 py-3.5 text-center text-sm font-semibold md:w-auto"
+              >
+                {buttonText}
+              </a>
+              <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-muted">
+                <span className="flex items-center gap-1.5">
+                  <svg viewBox="0 0 12 12" className="h-3 w-3 shrink-0 text-emerald-400" fill="none" aria-hidden="true">
+                    <path d="M10 3 4.5 8.5 2 6" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                  Sin compromiso
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <svg viewBox="0 0 12 12" className="h-3 w-3 shrink-0 text-emerald-400" fill="none" aria-hidden="true">
+                    <path d="M10 3 4.5 8.5 2 6" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                  Respuesta en 24h
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <svg viewBox="0 0 12 12" className="h-3 w-3 shrink-0 text-emerald-400" fill="none" aria-hidden="true">
+                    <path d="M10 3 4.5 8.5 2 6" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                  100% gratuita
+                </span>
+              </div>
+            </div>
           </div>
         </motion.div>
       </motion.div>

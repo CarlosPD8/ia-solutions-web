@@ -7,6 +7,46 @@ type Props = {
   services: Service[];
 };
 
+type ServiceTheme = {
+  accent: string;
+  iconGradient: string;
+  iconBorder: string;
+  numberColor: string;
+  dotColor: string;
+};
+
+const SERVICE_THEMES: Record<string, ServiceTheme> = {
+  chatbots: {
+    accent: "#3478ff",
+    iconGradient: "radial-gradient(circle at 35% 30%, rgba(52,120,255,0.30), rgba(18,42,120,0.22) 70%)",
+    iconBorder: "rgba(52, 120, 255, 0.32)",
+    numberColor: "#5c96ff",
+    dotColor: "bg-[#5c96ff]",
+  },
+  automation: {
+    accent: "#8b5cf6",
+    iconGradient: "radial-gradient(circle at 35% 30%, rgba(139,92,246,0.30), rgba(60,22,130,0.22) 70%)",
+    iconBorder: "rgba(139, 92, 246, 0.32)",
+    numberColor: "#a78bfa",
+    dotColor: "bg-[#a78bfa]",
+  },
+  analytics: {
+    accent: "#06b6d4",
+    iconGradient: "radial-gradient(circle at 35% 30%, rgba(6,182,212,0.28), rgba(8,72,90,0.22) 70%)",
+    iconBorder: "rgba(6, 182, 212, 0.3)",
+    numberColor: "#22d3ee",
+    dotColor: "bg-[#22d3ee]",
+  },
+};
+
+const DEFAULT_THEME: ServiceTheme = {
+  accent: "#3478ff",
+  iconGradient: "radial-gradient(circle at 35% 30%, rgba(126,172,255,0.22), rgba(21,39,78,0.22) 70%)",
+  iconBorder: "rgba(255,255,255,0.20)",
+  numberColor: "#5c96ff",
+  dotColor: "bg-secondary",
+};
+
 export const ServicesSection = ({ services }: Props) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const total = services.length;
@@ -175,20 +215,26 @@ export const ServicesSection = ({ services }: Props) => {
             {services.map((service, index) => {
               const relative = getRelative(index);
               const visible = visibleIndexes.has(index);
-              const style = visible ? getMobileCardStyle(relative) : getMobileCardStyle(99);
+              const cardStyle = visible ? getMobileCardStyle(relative) : getMobileCardStyle(99);
+              const theme = SERVICE_THEMES[service.id] ?? DEFAULT_THEME;
 
               return (
                 <article
                   key={`mobile-${service.id}`}
-                  style={style}
+                  style={cardStyle}
                   className="surface-card absolute left-1/2 top-0 flex h-[31rem] w-[min(88vw,23.5rem)] flex-col p-6 will-change-transform transition-[transform,opacity] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
                 >
+                  <div className="pointer-events-none absolute inset-0 rounded-[28px] opacity-60"
+                    style={{ background: `radial-gradient(420px 180px at 80% -10%, ${theme.accent}22, transparent 65%)` }} />
                   <div className="relative z-10">
-                    <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-white/20 bg-[radial-gradient(circle_at_35%_30%,rgba(126,172,255,0.22),rgba(21,39,78,0.22)_70%)] shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_8px_20px_rgba(12,26,58,0.28)]">
-                      <ServiceCardIcon id={service.id} />
+                    <div
+                      className="mb-5 inline-flex h-13 w-13 items-center justify-center rounded-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_8px_24px_rgba(0,0,0,0.3)]"
+                      style={{ background: theme.iconGradient, border: `1px solid ${theme.iconBorder}` }}
+                    >
+                      <ServiceCardIcon id={service.id} theme={theme} />
                     </div>
 
-                    <div className="mb-3 text-xs font-medium tracking-[0.2em] text-secondary">
+                    <div className="mb-3 text-xs font-medium tracking-[0.2em]" style={{ color: theme.numberColor }}>
                       {String(index + 1).padStart(2, "0")}
                     </div>
                     <h3 className="text-[1.95rem] font-semibold tracking-tight text-primary leading-tight">
@@ -198,7 +244,7 @@ export const ServicesSection = ({ services }: Props) => {
                     <ul className="mt-5 space-y-3 text-base text-muted">
                       {service.benefits.map((benefit) => (
                         <li key={benefit} className="flex items-start gap-2.5">
-                          <span className="mt-2 h-1.5 w-1.5 rounded-full bg-secondary" />
+                          <span className="mt-2 h-1.5 w-1.5 rounded-full shrink-0" style={{ background: theme.accent }} />
                           <span>{benefit}</span>
                         </li>
                       ))}
@@ -216,23 +262,29 @@ export const ServicesSection = ({ services }: Props) => {
               {services.map((service, index) => {
                 const relative = getRelative(index);
                 const visible = visibleIndexes.has(index);
-                const isCenter = relative === 0;
-                const isLeft = relative < 0;
-                const style = visible ? getCardStyle(relative) : getCardStyle(99);
+                const cardStyle = visible ? getCardStyle(relative) : getCardStyle(99);
+                const theme = SERVICE_THEMES[service.id] ?? DEFAULT_THEME;
 
                 return (
                   <article
                     key={service.id}
-                    style={style}
+                    style={cardStyle}
                     onClick={onDesktopCardClick(relative)}
                     className="js-service-card scene-service-card surface-card absolute left-[50vw] top-0 flex h-[32rem] w-[clamp(26rem,44vw,32rem)] flex-col p-7 will-change-transform transition-[transform,opacity] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
                   >
+                    <div
+                      className="pointer-events-none absolute inset-0 rounded-[28px] opacity-70"
+                      style={{ background: `radial-gradient(500px 200px at 85% -8%, ${theme.accent}20, transparent 62%)` }}
+                    />
                     <div className="relative z-10 pointer-events-none">
-                      <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-white/20 bg-[radial-gradient(circle_at_35%_30%,rgba(126,172,255,0.22),rgba(21,39,78,0.22)_70%)] shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_8px_20px_rgba(12,26,58,0.28)]">
-                        <ServiceCardIcon id={service.id} />
+                      <div
+                        className="mb-5 inline-flex h-13 w-13 items-center justify-center rounded-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_8px_24px_rgba(0,0,0,0.3)]"
+                        style={{ background: theme.iconGradient, border: `1px solid ${theme.iconBorder}` }}
+                      >
+                        <ServiceCardIcon id={service.id} theme={theme} />
                       </div>
 
-                      <div className="mb-3 text-xs font-medium tracking-[0.2em] text-secondary">
+                      <div className="mb-3 text-xs font-medium tracking-[0.2em]" style={{ color: theme.numberColor }}>
                         {String(index + 1).padStart(2, "0")}
                       </div>
 
@@ -244,7 +296,7 @@ export const ServicesSection = ({ services }: Props) => {
                       <ul className="mt-6 space-y-3 text-lg text-muted">
                         {service.benefits.map((benefit) => (
                           <li key={benefit} className="flex items-start gap-2.5">
-                            <span className="mt-2 h-1.5 w-1.5 rounded-full bg-secondary" />
+                            <span className="mt-2 h-1.5 w-1.5 rounded-full shrink-0" style={{ background: theme.accent }} />
                             <span>{benefit}</span>
                           </li>
                         ))}
@@ -261,10 +313,11 @@ export const ServicesSection = ({ services }: Props) => {
   );
 };
 
-const ServiceCardIcon = ({ id }: { id: string }) => {
+const ServiceCardIcon = ({ id, theme }: { id: string; theme?: ServiceTheme }) => {
+  const color = theme?.accent ?? "#79b4ff";
   if (id === "chatbots") {
     return (
-      <svg viewBox="0 0 24 24" className="h-6 w-6 text-[#79b4ff]" fill="none" aria-hidden="true">
+      <svg viewBox="0 0 24 24" className="h-6 w-6" style={{ color }} fill="none" aria-hidden="true">
         <path
           d="M5.5 6.5h13a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-7.2l-3.7 2.5v-2.5H5.5a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2Z"
           stroke="currentColor"
@@ -280,7 +333,7 @@ const ServiceCardIcon = ({ id }: { id: string }) => {
 
   if (id === "automation") {
     return (
-      <svg viewBox="0 0 24 24" className="h-6 w-6 text-[#79b4ff]" fill="none" aria-hidden="true">
+      <svg viewBox="0 0 24 24" className="h-6 w-6" style={{ color }} fill="none" aria-hidden="true">
         <path d="M12 4.2V6.3" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
         <circle cx="12" cy="3.2" r="0.9" fill="currentColor" />
         <path
@@ -297,7 +350,7 @@ const ServiceCardIcon = ({ id }: { id: string }) => {
   }
 
   return (
-    <svg viewBox="0 0 24 24" className="h-6 w-6 text-[#79b4ff]" fill="none" aria-hidden="true">
+    <svg viewBox="0 0 24 24" className="h-6 w-6" style={{ color }} fill="none" aria-hidden="true">
       <path d="M4 18h16" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
       <path d="M6.5 16V11" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
       <path d="M11.8 16V7.8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />

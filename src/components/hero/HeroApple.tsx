@@ -61,7 +61,8 @@ export const HeroApple = ({ title, subtitle, primaryCta, secondaryCta }: HeroApp
       <div className="section-shell flex min-h-[100svh] items-center py-16 md:py-20">
         <div className="grid w-full gap-10 md:grid-cols-[1fr_1fr] md:items-center">
           <div className="scene-hero-copy space-y-7 will-change-transform">
-            <span className="inline-flex rounded-full border border-white/15 bg-white/[0.03] px-3 py-1 text-xs font-medium text-secondary">
+            <span className="inline-flex items-center gap-2 rounded-full border border-secondary/30 bg-secondary/[0.07] px-3.5 py-1.5 text-xs font-medium text-secondary">
+              <span className="h-1.5 w-1.5 rounded-full bg-secondary animate-pulse" />
               Soluciones de IA para empresas
             </span>
 
@@ -85,7 +86,26 @@ export const HeroApple = ({ title, subtitle, primaryCta, secondaryCta }: HeroApp
               </a>
             </div>
 
-            <p className="text-xs text-muted">Evaluación inicial gratuita. Sin compromisos.</p>
+            <div className="flex flex-wrap items-center gap-2 pt-1">
+              <span className="trust-chip">
+                <svg viewBox="0 0 12 12" className="h-3 w-3 shrink-0 text-emerald-400" fill="none" aria-hidden="true">
+                  <path d="M10 3 4.5 8.5 2 6" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                Sin contratos
+              </span>
+              <span className="trust-chip">
+                <svg viewBox="0 0 12 12" className="h-3 w-3 shrink-0 text-emerald-400" fill="none" aria-hidden="true">
+                  <path d="M10 3 4.5 8.5 2 6" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                Evaluación gratuita
+              </span>
+              <span className="trust-chip">
+                <svg viewBox="0 0 12 12" className="h-3 w-3 shrink-0 text-emerald-400" fill="none" aria-hidden="true">
+                  <path d="M10 3 4.5 8.5 2 6" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                +20 empresas atendidas
+              </span>
+            </div>
           </div>
 
           <div className="scene-hero-orbit hero-orbit-panel surface-card relative overflow-hidden p-3 sm:p-6 md:p-7">

@@ -114,7 +114,7 @@ export const HowItWorksSection = ({ steps }: Props) => {
             <div className="absolute left-9 top-14 bottom-14 w-px bg-gradient-to-b from-white/30 via-white/15 to-transparent md:left-10" />
             <div className="absolute -left-24 top-10 h-72 w-72 rounded-full border border-white/10" />
 
-            <div className="relative space-y-6">
+            <div className="relative space-y-4">
               {steps.map((step, index) => (
                 <article
                   key={step.id}
@@ -122,7 +122,7 @@ export const HowItWorksSection = ({ steps }: Props) => {
                     if (!node) return;
                     stepRefs.current[index] = node;
                   }}
-                  className="scene-process-step rounded-2xl border border-white/10 bg-white/[0.03] p-4 opacity-100 will-change-transform"
+                  className="scene-process-step rounded-2xl border border-white/10 bg-white/[0.03] p-5 opacity-100 will-change-transform transition-colors duration-300 hover:border-white/20 hover:bg-white/[0.05]"
                 >
                   <div className="flex items-start gap-4">
                     <span
@@ -130,13 +130,13 @@ export const HowItWorksSection = ({ steps }: Props) => {
                         if (!node) return;
                         dotRefs.current[index] = node;
                       }}
-                      className="mt-1 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-[11px] font-semibold text-primary"
+                      className="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-[11px] font-bold tracking-wide text-primary"
                     >
                       {String(index + 1).padStart(2, "0")}
                     </span>
-                    <div>
-                      <h3 className="text-2xl font-semibold tracking-tight text-primary">{step.title}</h3>
-                      <p className="mt-2 text-sm leading-7 text-muted">{step.description}</p>
+                    <div className="min-w-0">
+                      <h3 className="text-xl font-semibold tracking-tight text-primary">{step.title}</h3>
+                      <p className="mt-1.5 text-sm leading-7 text-muted">{step.description}</p>
                     </div>
                   </div>
                 </article>
