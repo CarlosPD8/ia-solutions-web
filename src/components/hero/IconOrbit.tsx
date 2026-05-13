@@ -384,6 +384,7 @@ const SolarSystem = ({
             depthWrite={false}
           />
         </mesh>
+        
       </group>
 
       {planets.map((planet, index) => (
