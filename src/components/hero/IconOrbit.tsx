@@ -1,6 +1,6 @@
 "use client";
 
-import { Canvas, useFrame, useLoader } from "@react-three/fiber";
+import { Canvas, useFrame } from "@react-three/fiber";
 import { Suspense, useEffect, useMemo, useRef, type MutableRefObject, type PointerEventHandler } from "react";
 import * as THREE from "three";
 import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
@@ -69,6 +69,17 @@ const ICON_TEXTURE_URLS: Record<IconKind, string> = {
   docker: "/brand-icons/docker.svg",
   gmail: "/brand-icons/gmail.svg",
   github: "/brand-icons/github.svg",
+};
+
+const ICON_META: Record<IconKind, { bg: string; glow: string }> = {
+  react:    { bg: "#0d2a3b", glow: "#61dafb" },
+  whatsapp: { bg: "#075e54", glow: "#25d366" },
+  n8n:      { bg: "#2a1020", glow: "#ea4b71" },
+  sql:      { bg: "#0d3349", glow: "#00758f" },
+  nextjs:   { bg: "#111111", glow: "#e0e0e0" },
+  docker:   { bg: "#0e3a5a", glow: "#2496ed" },
+  gmail:    { bg: "#2a0d0d", glow: "#ea4335" },
+  github:   { bg: "#0d1117", glow: "#8b949e" },
 };
 
 export const IconOrbit = ({ compact = false }: { compact?: boolean }) => {
@@ -202,26 +213,23 @@ const SolarSystem = ({
   const spinRef = useRef(0);
   const planetRefs = useRef<THREE.Group[]>([]);
 
-  const iconTextureList = useLoader(
-    THREE.TextureLoader,
-    (Object.keys(ICON_TEXTURE_URLS) as IconKind[]).map((kind) => ICON_TEXTURE_URLS[kind]),
-  );
   const iconTextures = useMemo(() => {
-    const map = {} as Record<IconKind, THREE.Texture>;
-    (Object.keys(ICON_TEXTURE_URLS) as IconKind[]).forEach((kind, index) => {
-      map[kind] = iconTextureList[index];
+    const map = {} as Record<IconKind, THREE.CanvasTexture>;
+    (Object.keys(ICON_TEXTURE_URLS) as IconKind[]).forEach((kind) => {
+      map[kind] = makeIconTexture(kind, ICON_TEXTURE_URLS[kind]);
     });
     return map;
-  }, [iconTextureList]);
+  }, []);
   const iaTextTexture = useMemo(() => makeIATextTexture(), []);
   const sceneHalo = useMemo(() => makeSceneHaloTexture(), []);
 
   useEffect(
     () => () => {
+      Object.values(iconTextures).forEach((t) => t.dispose());
       iaTextTexture.dispose();
       sceneHalo.dispose();
     },
-    [iaTextTexture, sceneHalo],
+    [iconTextures, iaTextTexture, sceneHalo],
   );
 
   useFrame(({ clock, camera }, delta) => {
@@ -386,35 +394,21 @@ const SolarSystem = ({
             planetRefs.current[index] = node;
           }}
         >
-          {/* Halo exterior difuso */}
           <mesh renderOrder={1}>
             <circleGeometry args={[planet.size * 0.58, 48]} />
             <meshBasicMaterial
-              color="#4466dd"
+              color={ICON_META[planet.icon].glow}
               transparent
-              opacity={0.18}
+              opacity={0.28}
               blending={THREE.AdditiveBlending}
               depthWrite={false}
             />
           </mesh>
-          {/* Halo interior más brillante */}
-          <mesh renderOrder={2}>
-            <circleGeometry args={[planet.size * 0.38, 40]} />
-            <meshBasicMaterial
-              color="#7799ff"
-              transparent
-              opacity={0.22}
-              blending={THREE.AdditiveBlending}
-              depthWrite={false}
-            />
-          </mesh>
-          {/* Icono flotante — siempre visible */}
           <mesh renderOrder={3}>
-            <planeGeometry args={[planet.size * 0.86, planet.size * 0.86]} />
+            <planeGeometry args={[planet.size * 0.88, planet.size * 0.88]} />
             <meshBasicMaterial
               map={iconTextures[planet.icon]}
               transparent
-              opacity={1}
               depthWrite={false}
             />
           </mesh>
@@ -461,6 +455,47 @@ const OrbitTube = ({
     </mesh>
   );
 };
+
+function makeIconTexture(kind: IconKind, svgUrl: string): THREE.CanvasTexture {
+  const size = 256;
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return new THREE.CanvasTexture(canvas);
+
+  const meta = ICON_META[kind];
+  const cx = size / 2;
+  const cy = size / 2;
+  const r = size / 2 - 3;
+
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.fillStyle = meta.bg;
+  ctx.fill();
+
+  const inner = ctx.createRadialGradient(cx, cy * 0.7, 4, cx, cy, r);
+  inner.addColorStop(0, "rgba(255,255,255,0.14)");
+  inner.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.fillStyle = inner;
+  ctx.fill();
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.needsUpdate = true;
+
+  const img = new window.Image();
+  img.onload = () => {
+    const pad = size * 0.18;
+    ctx.drawImage(img, pad, pad, size - pad * 2, size - pad * 2);
+    texture.needsUpdate = true;
+  };
+  img.src = svgUrl;
+
+  return texture;
+}
 
 function makeIATextTexture() {
   const canvas = document.createElement("canvas");
