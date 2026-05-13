@@ -116,7 +116,7 @@ export const QuizAutomatizacion = ({ className = "" }: { className?: string }) =
                 onClick={reset}
                 className="rounded-full border border-blue-300/30 bg-[linear-gradient(180deg,#3f86ff,#1f6bff)] px-4 py-2 text-sm font-medium text-white shadow-[0_10px_24px_rgba(31,107,255,0.35)] transition hover:brightness-110"
               >
-                Repetir quiz
+                Repetir encuesta
               </button>
             </div>
           </motion.div>
