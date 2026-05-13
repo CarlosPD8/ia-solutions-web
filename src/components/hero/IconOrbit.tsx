@@ -1,6 +1,5 @@
 "use client";
 
-import { RoundedBox } from "@react-three/drei";
 import { Canvas, useFrame, useLoader } from "@react-three/fiber";
 import { Suspense, useEffect, useMemo, useRef, type MutableRefObject, type PointerEventHandler } from "react";
 import * as THREE from "three";
@@ -20,7 +19,6 @@ const CORE_RADIUS = 0.86;
 const CORE_BASE_ROTATION_SPEED = 0.14;
 const CORE_IDLE_TILT_X = -0.18;
 const CORE_IDLE_TILT_Z = -0.05;
-const TILE_DEPTH = 0.14;
 const TILE_FLOAT_AMPLITUDE = 0.034;
 const MOBILE_PLANET_COUNT = 5;
 const CORE_TEXT_Z = CORE_RADIUS * 0.7;
@@ -211,10 +209,7 @@ const SolarSystem = ({
   const iconTextures = useMemo(() => {
     const map = {} as Record<IconKind, THREE.Texture>;
     (Object.keys(ICON_TEXTURE_URLS) as IconKind[]).forEach((kind, index) => {
-      const texture = iconTextureList[index];
-      texture.colorSpace = THREE.SRGBColorSpace;
-      texture.needsUpdate = true;
-      map[kind] = texture;
+      map[kind] = iconTextureList[index];
     });
     return map;
   }, [iconTextureList]);
@@ -391,55 +386,35 @@ const SolarSystem = ({
             planetRefs.current[index] = node;
           }}
         >
-          <RoundedBox args={[planet.size, planet.size * 0.86, TILE_DEPTH]} radius={0.1} smoothness={6}>
-            <meshPhysicalMaterial
-              color="#0e1c3d"
-              roughness={0.22}
-              metalness={0.55}
-              clearcoat={1}
-              clearcoatRoughness={0.12}
-              emissive="#0a1830"
-              emissiveIntensity={0.5}
-            />
-          </RoundedBox>
-          {/* Fondo circular claro detrás del icono para contraste */}
-          <mesh position={[0, 0, TILE_DEPTH * 0.52 + 0.004]}>
-            <circleGeometry args={[planet.size * 0.36, 40]} />
+          {/* Halo exterior difuso */}
+          <mesh renderOrder={1}>
+            <circleGeometry args={[planet.size * 0.58, 48]} />
             <meshBasicMaterial
-              color="#ffffff"
+              color="#4466dd"
               transparent
-              opacity={0.08}
+              opacity={0.18}
+              blending={THREE.AdditiveBlending}
               depthWrite={false}
             />
           </mesh>
-          {/* Icono con meshBasicMaterial: siempre visible sin depender de la luz */}
-          <mesh position={[0, 0, TILE_DEPTH * 0.52 + 0.012]}>
-            <planeGeometry args={[planet.size * 0.70, planet.size * 0.70]} />
+          {/* Halo interior más brillante */}
+          <mesh renderOrder={2}>
+            <circleGeometry args={[planet.size * 0.38, 40]} />
+            <meshBasicMaterial
+              color="#7799ff"
+              transparent
+              opacity={0.22}
+              blending={THREE.AdditiveBlending}
+              depthWrite={false}
+            />
+          </mesh>
+          {/* Icono flotante — siempre visible */}
+          <mesh renderOrder={3}>
+            <planeGeometry args={[planet.size * 0.86, planet.size * 0.86]} />
             <meshBasicMaterial
               map={iconTextures[planet.icon]}
               transparent
               opacity={1}
-              depthWrite={false}
-            />
-          </mesh>
-          {/* Reflejo sutil en el borde superior del tile */}
-          <mesh position={[0, planet.size * 0.2, TILE_DEPTH * 0.5]} rotation-x={-0.01}>
-            <planeGeometry args={[planet.size * 0.82, planet.size * 0.18]} />
-            <meshBasicMaterial
-              color="#ddeeff"
-              transparent
-              opacity={0.11}
-              blending={THREE.AdditiveBlending}
-              depthWrite={false}
-            />
-          </mesh>
-          <mesh position={[0, 0, TILE_DEPTH * 0.48]}>
-            <planeGeometry args={[planet.size * 1.02, planet.size * 0.92]} />
-            <meshBasicMaterial
-              color="#3355ff"
-              transparent
-              opacity={0.07}
-              blending={THREE.AdditiveBlending}
               depthWrite={false}
             />
           </mesh>
