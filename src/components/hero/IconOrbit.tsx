@@ -391,46 +391,54 @@ const SolarSystem = ({
             planetRefs.current[index] = node;
           }}
         >
-          <RoundedBox args={[planet.size, planet.size * 0.82, TILE_DEPTH]} radius={0.09} smoothness={6}>
+          <RoundedBox args={[planet.size, planet.size * 0.86, TILE_DEPTH]} radius={0.1} smoothness={6}>
             <meshPhysicalMaterial
-              color="#060c1e"
-              roughness={0.16}
-              metalness={0.74}
+              color="#0e1c3d"
+              roughness={0.22}
+              metalness={0.55}
               clearcoat={1}
-              clearcoatRoughness={0.09}
-              emissive="#0a1630"
-              emissiveIntensity={0.32}
-              reflectivity={0.9}
+              clearcoatRoughness={0.12}
+              emissive="#0a1830"
+              emissiveIntensity={0.5}
             />
           </RoundedBox>
-          <mesh position={[0, 0, TILE_DEPTH * 0.52 + 0.006]}>
-            <planeGeometry args={[planet.size * 0.62, planet.size * 0.62]} />
-            <meshStandardMaterial
-              map={iconTextures[planet.icon]}
+          {/* Fondo circular claro detrás del icono para contraste */}
+          <mesh position={[0, 0, TILE_DEPTH * 0.52 + 0.004]}>
+            <circleGeometry args={[planet.size * 0.36, 40]} />
+            <meshBasicMaterial
+              color="#ffffff"
               transparent
-              emissive="#1a3888"
-              emissiveIntensity={0.58}
-              roughness={0.14}
-              metalness={0.1}
+              opacity={0.08}
+              depthWrite={false}
             />
           </mesh>
-          <mesh position={[0, planet.size * 0.1, TILE_DEPTH * 0.5]} rotation-x={-0.01}>
-            <planeGeometry args={[planet.size * 0.84, planet.size * 0.28]} />
+          {/* Icono con meshBasicMaterial: siempre visible sin depender de la luz */}
+          <mesh position={[0, 0, TILE_DEPTH * 0.52 + 0.012]}>
+            <planeGeometry args={[planet.size * 0.70, planet.size * 0.70]} />
             <meshBasicMaterial
-              color="#d8e8ff"
+              map={iconTextures[planet.icon]}
               transparent
-              opacity={0.09}
+              opacity={1}
+              depthWrite={false}
+            />
+          </mesh>
+          {/* Reflejo sutil en el borde superior del tile */}
+          <mesh position={[0, planet.size * 0.2, TILE_DEPTH * 0.5]} rotation-x={-0.01}>
+            <planeGeometry args={[planet.size * 0.82, planet.size * 0.18]} />
+            <meshBasicMaterial
+              color="#ddeeff"
+              transparent
+              opacity={0.11}
               blending={THREE.AdditiveBlending}
               depthWrite={false}
             />
           </mesh>
-          
           <mesh position={[0, 0, TILE_DEPTH * 0.48]}>
-            <planeGeometry args={[planet.size * 1.0, planet.size * 0.9]} />
+            <planeGeometry args={[planet.size * 1.02, planet.size * 0.92]} />
             <meshBasicMaterial
-              color="#4466ff"
+              color="#3355ff"
               transparent
-              opacity={0.06}
+              opacity={0.07}
               blending={THREE.AdditiveBlending}
               depthWrite={false}
             />
